@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input{
+    @apply w-[400px0] border border-gray-200 py-2 px-6
+    bg-zinc-100/40;
+}
+@layer base {
+    .carouselform .swiper-button-prev,
+    .carouselform .swiper-button-next {
+        @apply bg-green-600 text-white top-[96%] md:top-[90%] w-[46px] rounded-full z-20
+    }
+    .carouselform .swiper-button-prev {
+        @apply left-[35%] md:left-[40%] lg:left-[45%]
+    }
+    .carouselform .swiper-button-next {
+        @apply right-[35%] md:right-[40%] lg:right-[45%]
+    }
+    .carouselform .swiper-button-prev::after,
+    .carouselform .swiper-button-next::after{
+        @apply text-lg
+    }
+
+}
