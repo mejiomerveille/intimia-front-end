@@ -1,124 +1,118 @@
-'use client'
+"use client";
 
-import Link from 'next/link';
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Headline from './Headline';
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const RegisterForm: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password1, setPassword] = useState('');
-  const [password2, setRePassword] = useState('');
-  const [errors, setErrors] = useState([]);
+export default function RegisterForm() {
+  const [username, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [first_name, setFirstName] = useState("");
+  const [last_name, setLastName] = useState("");
+  const [password2, setPassword2] = useState("");
+  const router = useRouter();
 
-  // Get CSRF token
-  const getCsrfToken = async () => {
-    const response = await fetch('http://127.0.0.1:8000/api/csrf/', {
-      credentials: 'include',
-    });
-    const data = await response.json();
-    console.log(data)
-    return data.csrfToken; 
-  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const data = {
-      username,
-      email,
-      password1,
-      password2,
-    };
-
-    const csrfToken = await getCsrfToken();
+    if (!username || !email || !password || !first_name || !password2 || !last_name ) {
+      setError("All fields are necessary.");
+      return;
+    }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/signup/', {
-        method: 'POST',
+
+      const response = await fetch("http://127.0.0.1:8000/api/register/", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
+          "Content-Type": "application/json",
+          'Accept': 'application/json'
+
         },
-        credentials: 'include',
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          username,
+          email,
+          first_name,
+          last_name,
+          password,
+          password2,
+        }),
       });
+        if (response.ok) {
+            const data = await response.json()
+            console.log(data)
+            router.push("/");
 
-      if (response.ok) {
-        console.log("resource created")
-        const responseData = await response.json();
-        console.log(responseData);
-      } else if (response.status === 400) {
-        const errorData = await response.json();
-        console.error('Error during the request:', errorData);
-        setErrors(errorData);
-      } else {
-        console.error('Erreur lors de la requête');
-      }
-    } catch (error) {
-      console.error(error);
+        }
+        else {
+            const error = await response.json()
+            console.log(error);
+            if (response.status === 400) {
+                error.value = error
+            }
+        }
+        
     }
-  }
-
+    catch (error) {
+        console.log(error)
+    }
+  };
 
   return (
     <div className="grid place-items-center h-screen">
-      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-500  ">
-        <h1 className="text-xl font-bold my-4 text-center">S'inscrire avec</h1>
-        <div className="flex w-full justify-around pb-3">
-          <Image src="/facebook.jpeg" width={50} height={50} alt='logo de facebook'/>
-          <Image src="/ggg-playstore.png" width={50} height={50} alt='logo de facebook'/>
-          <Image src="/ttt-playstore.png" width={50} height={50} alt='logo de facebook'/>
-        </div>
-        <div>
-          <Headline title="ou" />
-        </div>
-        <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400">
+        <h1 className="text-xl font-bold my-4">Register</h1>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
+            onChange={(e) => setName(e.target.value)}
             type="text"
-            name="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Nom d'utilisateur"
+            placeholder="Pseudo"
           />
           <input
-            type="text"
-            name="email"
-            value={email}
             onChange={(e) => setEmail(e.target.value)}
+            type="text"
             placeholder="Email"
           />
           <input
-            type="password"
-            name="password1"
-            value={password1}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mot de passe"
+            onChange={(e) => setFirstName(e.target.value)}
+            type="text"
+            placeholder="Nom"
           />
           <input
-            type="password"
-            name="password2"
-            value={password2}
-            onChange={(e) => setRePassword(e.target.value)}
-            placeholder="reecrir le Mot de passe"
+            onChange={(e) => setLastName(e.target.value)}
+            type="text"
+            placeholder="Prenom"
           />
-          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2" type="submit">
-            Créer un compte
-          </button>
-          {/* <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2"> */}
-            {Object.keys(errors).map((field) => (
-              <div key={field} className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
-                {field}: {errors[field].join(', ')}
-              </div>
-            ))}
-          {/* </div> */}
+          
+          <input
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            placeholder="Password"
+          />
 
-          <Link className="text-sm mt-3 text-right" href="/">
-            Vous avez déjà un compte ? <span className="underline">Connectez-vous</span>
+          <input
+            onChange={(e) => setPassword2(e.target.value)}
+            type="password"
+            placeholder="Confirm Password"
+          />
+          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
+            Register
+          </button>
+
+          {error && (
+            <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
+              {error}
+            </div>
+          )}
+
+          <Link className="text-sm mt-3 text-right" href={"/"}>
+            Already have an account? <span className="underline">Login</span>
           </Link>
         </form>
       </div>
     </div>
   );
-};
-export default RegisterForm;
+}
