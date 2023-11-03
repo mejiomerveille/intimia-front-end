@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://127.0.0.1:8000/api2';
+const BASE_URL = 'http://127.0.0.1:8000/api1';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -154,3 +154,6 @@ export const getRecentPosts = async () => {
   }
 };
 
+export const registerGrossesse = (data) => {
+  return axiosInstance.post('/register-grossesse/', data);
+}

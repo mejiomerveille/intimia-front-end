@@ -4,6 +4,7 @@ import { getCsrfToken } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Modal,{ setAppElement } from 'react-modal';
+import { registerGrossesse } from "@/app/services";
 
 
 
@@ -35,26 +36,45 @@ export default function InfoGrossesseForm() {
        transform: 'translate(-50%, -50%)'
     }
  }
- const handleSubmit = async (event : React.FormEvent<HTMLFormElement>) => {
-  event.preventDefault();
+//  const handleSubmit = async (event : React.FormEvent<HTMLFormElement>) => {
+//   event.preventDefault();
 
-  fetch("http://127.0.0.1:8000/api1/regis-grossesse/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "csrf-token": csrfToken,
-    },
-    body: JSON.stringify({ start_date: startDate }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-      router.replace("grossesse/evolution");
-    })
-    .catch((error) => {
-      console.error("Une erreur s'est produite:", error);
-    });
-};
+//   fetch("http://127.0.0.1:8000/api1/regis-grossesse/", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       "csrf-token": csrfToken,
+//     },
+//     body: JSON.stringify({ start_date: startDate }),
+//   })
+//     .then((response) => response.json())
+//     .then((data) => {
+//       console.log(data);
+//       router.replace("grossesse/evolution");
+//     })
+//     .catch((error) => {
+//       console.error("Une erreur s'est produite:", error);
+//     });
+// };
+
+const handleSubmit = async (event : React.FormEvent<HTMLFormElement>) => {
+  event.preventDefault();
+  try {    
+    const result = await registerGrossesse({ start_date: startDate })
+    if(result.status==200 || result.status==201){
+      console.log(result);
+      setTimeout(() => {
+        router.replace("grossesse/evolution");
+      }, 10000);
+    }
+    else{
+      console.log(result)
+    }
+  } catch (error) {
+    console.log(error);
+    
+  }
+}
 
 
   return (
