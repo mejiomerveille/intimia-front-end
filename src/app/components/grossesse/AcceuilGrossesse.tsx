@@ -65,7 +65,7 @@ const handleSubmit = async (event : React.FormEvent<HTMLFormElement>) => {
       console.log(result);
       setTimeout(() => {
         router.replace("grossesse/evolution");
-      }, 10000);
+      }, 2000);
     }
     else{
       console.log(result)
