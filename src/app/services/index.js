@@ -157,3 +157,11 @@ export const getRecentPosts = async () => {
 export const registerGrossesse = (data) => {
   return axiosInstance.post('/register-grossesse/', data);
 }
+
+export const updateGrossesse = (data) => {
+  return axiosInstance.put('/register-grossesse/', data);
+}
+
+export const getGrossesse = () => {
+  return axiosInstance.get('/get-grossesse/');
+}
