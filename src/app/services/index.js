@@ -1,62 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const BASE_URL = 'http://127.0.0.1:8000/api2';
+
+const axiosInstance = axios.create({
+  baseURL: BASE_URL,
+});
+
+axiosInstance.interceptors.request.use(function (config) {
+  // Running on client. Attach token to header.
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Token ${token}`;
+    }
+  }
+  return config;
+}, function (error) {
+  return Promise.reject(error);
+});
 
 export const getPosts = async () => {
-  const [posts, setPosts] = useState(null);
-  useEffect(() => {
-    const fetchPostInfo = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api2/posts/', {
-          headers: {
-            'Accept': 'application/json'
-          }
-        })
-        if (response.ok) {
-          const data = await response.json();
-          setPosts(data);
-        } else {
-          console.error('Erreur lors de la requête');
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchPostInfo();
-  }, []);
-
+  try {
+    const response = await axiosInstance.get('/posts/');
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      console.error('Erreur lors de la requête');
+    }
+  } catch (error) {
+    console.error(error);
+  }
 }
-
 
 export const getCategories = async () => {
-  const [categorie, setCategorie] = useState(null);
-  useEffect(() => {
-    const fetchCategorie = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api2/categories/', {
-          headers: {
-            'Accept': 'application/json'
-          }
-        })
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
-        } else {
-          console.error('Erreur lors de la requête');
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchCategorie();
-  }, []);
+  try {
+    const response = await axiosInstance.get('/categories/');
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      console.error('Erreur lors de la requête');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
 }
 
-import axios from 'axios';
 
 export const getPostDetails = async (slug) => {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/api2/posts/<slug>/`);
+    const response = await axiosInstance.get(`/posts/${slug}/`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -66,7 +59,7 @@ export const getPostDetails = async (slug) => {
 
 export const getSimilarPosts = async (categories, slug) => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api2/posts/similar/<slug>/', {
+    const response = await axiosInstance.get(`/posts/similar/${slug}/`, {
       params: {
         categories: categories,
         exclude: slug,
@@ -82,7 +75,7 @@ export const getSimilarPosts = async (categories, slug) => {
 
 export const getAdjacentPosts = async (createdAt, slug) => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api2/posts/adjacent/<createdAt>/<slug>/', {
+    const response = await axiosInstance.get(`/posts/adjacent/${createdAt}/${slug}/`, {
       params: {
         createdAt: createdAt,
         exclude: slug,
@@ -101,7 +94,7 @@ export const getAdjacentPosts = async (createdAt, slug) => {
 
 export const getCategoryPost = async (slug) => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api2/category/<slug>/', {
+    const response = await axiosInstance.get(`/category/${slug}/`, {
       params: {
         category: slug,
       },
@@ -115,7 +108,7 @@ export const getCategoryPost = async (slug) => {
 
 export const getFeaturedPosts = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api2/posts/featured/', {
+    const response = await axiosInstance.get(`/posts/featured/`, {
       params: {
         featured: true,
       },
@@ -129,7 +122,7 @@ export const getFeaturedPosts = async () => {
 
 export const submitComment = async (commentData) => {
   try {
-    const response = await axios.post('http://127.0.0.1:8000/api2/comments/submit/', commentData);
+    const response = await axiosInstance.post(`/comments/submit/`, commentData);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -139,7 +132,7 @@ export const submitComment = async (commentData) => {
 
 export const getComments = async (slug) => {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/api2/comments/<slug>/`);
+    const response = await axiosInstance.get(`/comments/${slug}/`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -149,7 +142,7 @@ export const getComments = async (slug) => {
 
 export const getRecentPosts = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/api2/posts/recent/', {
+    const response = await axiosInstance.get(`/posts/recent/`, {
       params: {
         limit: 3,
       },
@@ -160,3 +153,4 @@ export const getRecentPosts = async () => {
     return null;
   }
 };
+
