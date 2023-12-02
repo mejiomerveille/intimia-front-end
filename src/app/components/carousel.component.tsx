@@ -28,7 +28,7 @@ export default function Carousel({ slides }: { slides: any[] }) {
         }}
       >
         {slides.map((s) => {
-  return <Image src={s}  width={320} height={320} alt="..." key={s}/>;
+  return <img src={s}  width={320} height={320} alt="..." key={s}/>;
         })}
       </div>
 

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://127.0.0.1:8000/api1';
+const BASE_URL = 'http://127.0.0.1:8000/api2';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -49,7 +49,8 @@ export const getCategories = async () => {
 
 export const getPostDetails = async (slug) => {
   try {
-    const response = await axiosInstance.get(`/posts/${slug}/`);
+    const response = await axiosInstance.get(`/posts/${slug}`);
+    console.log(response.data)
     return response.data;
   } catch (error) {
     console.error(error);
