@@ -1,8 +1,12 @@
-import InfoGrossesseForm from "../components/grossesse/AcceuilGrossesse";
-import Navbar from "../components/Navbar";
-export default function InfoGrossesse(){
+"use client";
+import RegisterGrossesseForm from "@/components/grossesse/RegisterGrossesse";
+import BlogPage from "../../../pages/blogpage";
 
-    return(        
-        <InfoGrossesseForm/>
-    );
+
+export default function blog(){
+  return(
+    <div  id="root">
+    <RegisterGrossesseForm isOpened={true} />
+    </div>
+  )
 }

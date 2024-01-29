@@ -1,11 +1,8 @@
-import Navbar from "@/app/components/Navbar";
-import EvolutionGrossesseForm from "@/app/components/grossesse/HomeGrossesse";
-
+import EvolutionGrossesseForm from "@/components/grossesse/HomeGrossesse";
 export default function EvolutionGrossesse(){
 
     return(
-        <div>
-        <Navbar/>
+        <div >
         <EvolutionGrossesseForm/>
         </div>
     );

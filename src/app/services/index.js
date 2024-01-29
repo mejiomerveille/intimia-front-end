@@ -1,17 +1,23 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://127.0.0.1:8000/api2';
+const BASE_URL = 'http://127.0.0.1:8000/api/v1/';
+
+export const BASE_URL_MEDIA = 'http://127.0.0.1:8000/media';
+export const BASE_URL_MEDIAS = 'http://127.0.0.1:8000';
+
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
 });
 
+
+
 axiosInstance.interceptors.request.use(function (config) {
   // Running on client. Attach token to header.
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (token) {
-      config.headers.Authorization = `Token ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
   }
   return config;
@@ -19,23 +25,28 @@ axiosInstance.interceptors.request.use(function (config) {
   return Promise.reject(error);
 });
 
-export const getPosts = async () => {
+
+export async function getPosts() {
   try {
-    const response = await axiosInstance.get('/posts/');
+    const response = await axiosInstance.get('blog/posts/');
+    console.log(response.data);
     if (response.status === 200) {
       return response.data;
     } else {
       console.error('Erreur lors de la requête');
+      return []; // Retourner un tableau vide en cas d'erreur
     }
   } catch (error) {
     console.error(error);
+    return []; // Retourner un tableau vide en cas d'erreur
   }
 }
 
 export const getCategories = async () => {
   try {
-    const response = await axiosInstance.get('/categories/');
+    const response = await axiosInstance.get('blog/category/all');
     if (response.status === 200) {
+      console.log(response.data)
       return response.data;
     } else {
       console.error('Erreur lors de la requête');
@@ -49,21 +60,20 @@ export const getCategories = async () => {
 
 export const getPostDetails = async (slug) => {
   try {
-    const response = await axiosInstance.get(`/posts/${slug}`);
-    console.log(response.data)
+    const response = await axiosInstance.get(`blog/posts/${slug}`);
+    // console.log(response.data)
     return response.data;
   } catch (error) {
     console.error(error);
     return null;
   }
 };
-
+// /?categories=${categories}&slug=${slug}
 export const getSimilarPosts = async (categories, slug) => {
   try {
-    const response = await axiosInstance.get(`/posts/similar/${slug}/`, {
+    const response = await axiosInstance.get(`blog/posts/similar`, {
       params: {
         categories: categories,
-        exclude: slug,
         limit: 3,
       },
     });
@@ -75,18 +85,18 @@ export const getSimilarPosts = async (categories, slug) => {
 };
 
 export const getAdjacentPosts = async (createdAt, slug) => {
+  const date = new Date(createdAt).getTime().toString()
+
   try {
-    const response = await axiosInstance.get(`/posts/adjacent/${createdAt}/${slug}/`, {
+    
+    const response = await axiosInstance.get(`blog/posts/adjacent/${date}/`, {
       params: {
         createdAt: createdAt,
         exclude: slug,
         limit: 2,
       },
     });
-    return {
-      next: response.data[0],
-      previous: response.data[1],
-    };
+    return response.data;
   } catch (error) {
     console.error(error);
     return null;
@@ -95,7 +105,7 @@ export const getAdjacentPosts = async (createdAt, slug) => {
 
 export const getCategoryPost = async (slug) => {
   try {
-    const response = await axiosInstance.get(`/category/${slug}/`, {
+    const response = await axiosInstance.get(`blog/category/${slug}/`, {
       params: {
         category: slug,
       },
@@ -109,7 +119,7 @@ export const getCategoryPost = async (slug) => {
 
 export const getFeaturedPosts = async () => {
   try {
-    const response = await axiosInstance.get(`/posts/featured/`, {
+    const response = await axiosInstance.get(`blog/posts/featured/`, {
       params: {
         featured: true,
       },
@@ -121,9 +131,10 @@ export const getFeaturedPosts = async () => {
   }
 };
 
-export const submitComment = async (commentData) => {
+export const submitComment = async (obj) => {
+  console.log(obj)
   try {
-    const response = await axiosInstance.post(`/comments/submit/`, commentData);
+    const response = await axiosInstance.post(`blog/comments/submit/`, obj);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -133,7 +144,7 @@ export const submitComment = async (commentData) => {
 
 export const getComments = async (slug) => {
   try {
-    const response = await axiosInstance.get(`/comments/${slug}/`);
+    const response = await axiosInstance.get(`blog/comments/${slug}/`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -143,7 +154,7 @@ export const getComments = async (slug) => {
 
 export const getRecentPosts = async () => {
   try {
-    const response = await axiosInstance.get(`/posts/recent/`, {
+    const response = await axiosInstance.get(`blog/posts/recent/`, {
       params: {
         limit: 3,
       },
@@ -156,13 +167,73 @@ export const getRecentPosts = async () => {
 };
 
 export const registerGrossesse = (data) => {
-  return axiosInstance.post('/register-grossesse/', data);
+  return axiosInstance.post('grossesse/register/', data);
 }
 
-export const updateGrossesse = (data) => {
-  return axiosInstance.put('/register-grossesse/', data);
+export const updateGrossesse = (data,pk) => {
+  return axiosInstance.put(`grossesse/edit/${pk}`, data);
 }
 
-export const getGrossesse = () => {
-  return axiosInstance.get('/get-grossesse/');
+export const getGrossesse = (pk) => {
+  return axiosInstance.get(`grossesse/get/${pk}`);
 }
+
+
+// utilisateur
+
+
+export const logout = async () => {
+  try {
+    const response = await axiosInstance.post(`user/logout/`);
+
+    localStorage.removeItem('refresh_token')
+    localStorage.removeItem('access_token')
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const login = async (data) => {
+  try {
+    const response = await axiosInstance.post(`user/login/`, data);
+     // sauvegarder le token dans le localStorage
+     localStorage.setItem('refresh_token', response.data.refresh)
+     localStorage.setItem('access_token', response.data.access)
+     // renvoyer a l'acceuil
+    
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.detail) {
+      const erreur=error.response.data.detail;
+      console.log(error.response.data.detail);
+    } else {
+      console.error(error);
+    }
+    return null;
+  }
+};
+
+export const register = async (obj) => {
+  try {
+    const response = await axiosInstance.post(`user/register/`, obj);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+
+
+export const getUserInfo = async () => {
+  try {
+    const response = await axiosInstance.get(`user/get/`);
+    localStorage.setItem('id', response.data.id)
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};

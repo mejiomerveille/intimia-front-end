@@ -1,8 +1,8 @@
-import Carousel from "../components/carousel.component";
 import first from "../../../public/bg2.jpg"
 import second from "../../../public/Sans titre.png"
 import third from "../../../public/Sans .jpeg"
 import four from "../../../public/im.jpeg"
+import Carousel from "@/components/carousel.component"
 function App() {
   let slides = [
     first,

@@ -1,10 +1,14 @@
-import RDVList from "@/app/components/rdv/Rdv-list";
-
+import Navbar from "@/components/Navbar";
+import RDVList from "@/components/rdv/Rdv-list";
 
 
 export default function RegisRdv(){
 
-    return(        
-        <RDVList/>
+    return(  
+        <div>
+            <Navbar/>
+
+            <RDVList/>
+        </div>      
     );
 }
