@@ -2,15 +2,18 @@ import React, { Component } from 'react';
 import Modal from 'react-modal';
 import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { Router } from "next/router";
-
-
+import { useRouter } from 'next/router';
+import { css } from '@emotion/react';
+import { BeatLoader } from 'react-spinners';
 import { registerGrossesse } from '@/app/services';
 
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
 
 const validationSchema = Yup.object().shape({
   start_date: Yup.string().required('La date de début est obligatoire.'),
-  user: Yup.string().required('L\'utilisateur est obligatoire.'),
 });
 
 class RegisterGrossesseForm extends Component {
@@ -18,11 +21,18 @@ class RegisterGrossesseForm extends Component {
     isOpen: true,
     successMessage: undefined,
     errorMessage: undefined,
+    isLoading: false,
   };
 
   setIsOpen = (value) => {
     this.setState({
       isOpen: value,
+    });
+  };
+
+  setIsLoading = (value) => {
+    this.setState({
+      isLoading: value,
     });
   };
 
@@ -38,12 +48,13 @@ class RegisterGrossesseForm extends Component {
     });
   };
 
-  handleSubmit = ({ start_date, user }) => {
-    registerGrossesse({ start_date, user })
+  handleSubmit = ({ start_date }) => {
+    this.setIsLoading(true);
+    registerGrossesse({ start_date })
       .then((response) => {
         if (response) {
           this.setSuccessMessage('Grossesse enregistrée !');
-          const router = new Router();
+          const router = useRouter();
           router.replace('grossesse/evolution');
         } else {
           this.setErrorMessage("Erreur lors de l'enregistrement.");
@@ -52,6 +63,9 @@ class RegisterGrossesseForm extends Component {
       .catch((error) => {
         console.error(error);
         this.setErrorMessage("Erreur lors de la communication avec le serveur.");
+      })
+      .finally(() => {
+        this.setIsLoading(false); // Désactiver le loader
       });
   };
 
@@ -107,25 +121,18 @@ class RegisterGrossesseForm extends Component {
                       component="span"
                       className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2"
                     />
-                    <Field
-                      type="text"
-                      id="user"
-                      name="user"
-                      className="border border-gray-300 rounded-lg p-2"
-                      required
-                    />
-                    <ErrorMessage
-                      name="user"
-                      component="span"
-                      className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2"
-                    />
                   </div>
                   <div className="flex justify-between">
                     <button
                       type="submit"
+                      disabled={this.state.isLoading}
                       className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     >
-                      Enregistrer
+                      {this.state.isLoading ? (
+                        <BeatLoader color={'#ffffff'} loading={this.state.isLoading} css={override} size={10} />
+                      ) : (
+                        'Enregistrer'
+                      )}
                     </button>
                   </div>
                 </form>

@@ -42,11 +42,11 @@ export default function s(){
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                 </svg>
             </div>
-            <h2 className="text-white dark:text-white text-lg font-medium">Symptomes</h2>
+            <h2 className="text-white dark:text-white text-lg font-medium">Bloc-notes</h2>
         </div>
         <div className="flex flex-col justify-between flex-grow">
             <p className="leading-relaxed text-base text-white dark:text-gray-300">
-                Enregistrer vos symptomes et recevez des conseils par rapport a ceux-ci.
+                ce bloc-note represente une exquice de journal intime pour votre grossesse.
             </p>
             <a href="/suivie/Symptomes" className="mt-3 text-black dark:text-white hover:text-blue-600 inline-flex items-center">Explorer
                 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"

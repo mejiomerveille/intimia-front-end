@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://127.0.0.1:8000/api/v1/';
+export const BASE_URL = 'http://127.0.0.1:8000/api/v1/';
 
 export const BASE_URL_MEDIA = 'http://127.0.0.1:8000/media';
 export const BASE_URL_MEDIAS = 'http://127.0.0.1:8000';
@@ -29,24 +29,24 @@ axiosInstance.interceptors.request.use(function (config) {
 export async function getPosts() {
   try {
     const response = await axiosInstance.get('blog/posts/');
-    console.log(response.data);
     if (response.status === 200) {
+      // console.log(response.data)
       return response.data;
     } else {
       console.error('Erreur lors de la requête');
-      return []; // Retourner un tableau vide en cas d'erreur
     }
   } catch (error) {
     console.error(error);
-    return []; // Retourner un tableau vide en cas d'erreur
   }
+  return null;
 }
+
 
 export const getCategories = async () => {
   try {
     const response = await axiosInstance.get('blog/category/all');
     if (response.status === 200) {
-      console.log(response.data)
+      // console.log(response.data)
       return response.data;
     } else {
       console.error('Erreur lors de la requête');
@@ -71,12 +71,14 @@ export const getPostDetails = async (slug) => {
 // /?categories=${categories}&slug=${slug}
 export const getSimilarPosts = async (categories, slug) => {
   try {
-    const response = await axiosInstance.get(`blog/posts/similar`, {
+    const response = await axiosInstance.get(`blog/posts/similar/?categories=cat_san`, {
       params: {
         categories: categories,
+        slug: slug,
         limit: 3,
       },
     });
+    console.log(response)
     return response.data;
   } catch (error) {
     console.error(error);
@@ -231,6 +233,32 @@ export const getUserInfo = async () => {
   try {
     const response = await axiosInstance.get(`user/get/`);
     localStorage.setItem('id', response.data.id)
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+
+
+
+export const registerrdv = async (obj) => {
+  try {
+    const response = await axiosInstance.post(`rdv/ajoute`, obj);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+// http://localhost:8000/api/v1/rdv/ajout/
+
+
+export const getrdv = async () => {
+  try {
+    const response = await axiosInstance.get(`rdv/get/`);
+    // localStorage.setItem('id', response.data.id)
     return response.data;
   } catch (error) {
     console.error(error);

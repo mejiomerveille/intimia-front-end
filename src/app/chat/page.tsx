@@ -1,139 +1,110 @@
 "use client";
-import type { NextPage } from "next";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useState } from 'react';
-import { register } from '../../app/services';
+import React, { useState } from 'react';
+import OpenAI from 'openai';
+import { Message } from 'stream-chat-react';
 
-// Yup schema to validate the form
-const schema = Yup.object().shape({
-  username: Yup.string().required(),
-  first_name: Yup.string().required(),
-  last_name: Yup.string().required(),
-  email: Yup.string().required().email(),
-  password: Yup.string().required().min(8),
-  password2: Yup.string().required().oneOf([Yup.ref('password')], 'Les mots de passe doivent correspondre.'),
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
 });
 
+export default function Chat() {
+  // State variables
+  const [userInput, setUserInput] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-const Signup: NextPage = () => {
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const handleUserInput = async () => {
+    // Start the loading state
+    setIsLoading(true);
 
-  // Formik hook to handle the form state
-  const formik = useFormik({
-    initialValues: {
-      username: "",
-      first_name: "",
-      last_name: "",
-      email: "",
-      password: "",
-      password2: "",
-    },
+    // Add the user's message to the chat history
+    setChatHistory((prevChat) => [
+      ...prevChat,
+      { role: 'user', content: userInput },
+    ]);
 
-    // Pass the Yup schema to validate the form
-    validationSchema: schema,
+    // Make a request to OpenAI for the chat completion
+    const chatCompletion = await openai.chat.completions.create({
+      messages: [
+        ...chatHistory,
+        { role: 'assistant', content: userInput },
+      ],
+      model: 'gpt-3.5-turbo',
+    });
 
-    // Handle form submission
-    onSubmit: async ({ username,first_name,last_name, email, password, password2}) => {
-      try {
-        const response = await register({ username, first_name,last_name, email, password ,password2});
-        if (response) {
-          setSuccessMessage('Inscription réussie !');
-        } else {
-          setErrorMessage('Erreur lors de l\'inscription.');
-        }
-      } catch (error) {
-        console.error(error);
-        setErrorMessage('Erreur lors de la communication avec le serveur.');
-      }
-    },
-  });
+    // Add the assistant's response to the chat history
+    setChatHistory((prevChat) => [
+      ...prevChat,
+      {
+        role: 'assistant',
+        content: chatCompletion.choices[0].message.content,
+      },
+    ]);
 
-  // Destructure the formik object
-  const { errors, touched, values, handleChange, handleSubmit } = formik;
+    // Clear the user input field and end the loading state
+    setUserInput('');
+    setIsLoading(false);
+  };
 
   return (
-    <div className="grid place-items-center h-screen">
-      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400 bg-gray-50">
-        <h1 className="text-xl font-bold my-4">Inscription</h1>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3" method="POST">
+    <div className='bg-grey-100 min-h-screen flex flex-col justify-center items-center mt-10'>
+      <div className='w-full max-w-screen-md mg-white p-4 rounded-lg shadow-md bg-stone-100'>
+        <div className='mb-4'>
+          <div className='text-4xl font-bold text-blue-800 mb-2'>
+            Intmia Chatbot 
+          </div>
+          <p className='text-gray-600 text-lg'>
+            Welcome to the intimiaChatBot. Ask me anything!!!
+          </p>
+        </div>
+        <div className='mb-4' style={{ height: '400px', overflow: 'auto' }}>
+          {chatHistory.map((Message, index) => (
+            <div
+              key={index}
+              className={`${
+                Message.role === 'user' ? 'text-left' : 'text-right'
+              } mb-2`}
+            >
+              <div
+                className={`rounded-full p-2 max-w-md mx-4 inline-block ${
+                  Message.role === 'user' ? 'bg-blue-800' : 'bg-green-300 text-green-800'
+                }`}
+              >
+                {Message.role === 'user' ? 'M' : 'I'}
+              </div>
+              <div
+                className={`max-w-md mx-4 my-2 inline-block ${
+                  Message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-gray-800'
+                } p-2 rounded-md`}
+              >
+                {Message.content}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className='flex'>
           <input
             type="text"
-            name="username"
-            value={values.username}
-            onChange={handleChange}
-            id="username"
-            placeholder="Pseudo"
-
+            placeholder='Ask me something'
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            className='flex-1 p-2 rounded-1-lg'
           />
-          {errors.username && touched.username && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.username}</span>}
-
-          <input
-            type="text"
-            name="first_name"
-            value={values.first_name}
-            onChange={handleChange}
-            id="first_name"
-            placeholder="Nom"
-
-          />
-          {errors.first_name && touched.first_name && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.first_name}</span>}
-          <input
-            type="text"
-            name="last_name"
-            value={values.last_name}
-            onChange={handleChange}
-            id="last_name"
-            placeholder="Prenom"
-
-          />
-          {errors.last_name && touched.last_name && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.last_name}</span>}
-
-          {/* <label htmlFor="email">Email</label> */}
-          <input
-            type="email"
-            name="email"
-            value={values.email}
-            onChange={handleChange}
-            id="email"
-            placeholder="Email"
-
-          />
-          {errors.email && touched.email && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.email}</span>}
-
-          <input
-            type="password"
-            name="password"
-            value={values.password}
-            onChange={handleChange}
-            id="password"
-            placeholder="Mot de passe"
-
-            
-          />
-          {errors.password && touched.password && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.password}</span>}
-
-
-          <input
-            type="password2"
-            name="password2"
-            value={values.password2}
-            onChange={handleChange}
-            id="password2"
-            placeholder="Reecrire le mot de passe"
-
-          />
-          {errors.password2 && touched.password2 && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.password2}</span>}
-
-          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2" type="submit">Submit</button>
-        </form>
-        {successMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{successMessage}</p>}
-        {errorMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errorMessage}</p>}
+          {isLoading ? (
+            <div className='bg-blue-500 text-white p-2 rounded-r-l animate-pulse'>
+              Loading...
+            </div>
+          ) : (
+            <button
+              onClick={handleUserInput}
+              className='bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600'
+            >
+              Ask
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
-};
-
-export default Signup;
+}

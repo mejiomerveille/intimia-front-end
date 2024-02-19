@@ -52,7 +52,8 @@ const FeaturedPosts = () => {
       </svg>
     </div>
   );
-
+if(featuredPosts)
+{
   return (
     <div className="mb-8">
       <Carousel infinite customLeftArrow={customLeftArrow} customRightArrow={customRightArrow} responsive={responsive} itemClass="px-4">
@@ -62,6 +63,12 @@ const FeaturedPosts = () => {
       </Carousel>
     </div>
   );
-};
+}else{
+  return (
+    <div className="mb-8">
+    </div>
+  );
+}
+}
 
 export default FeaturedPosts;

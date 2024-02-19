@@ -4,7 +4,8 @@ import { PostDetail, Categories, PostWidget, Author, Comments, CommentsForm, Loa
 import { getPosts, getPostDetails } from '@/app/services';
 import { AdjacentPosts } from '@/app/sections';
 import '@/app/globals.css';
-import Navbar from '@/components/Navbar';
+import Header from '@/components/ui/header';
+
 
 const PostDetails = ({ post }) => {
   const router = useRouter();
@@ -16,7 +17,7 @@ const PostDetails = ({ post }) => {
   if (post) {
     return (
       <>
-      <Navbar/>
+      {/* <Header/> */}
         <div className="container mx-auto px-10 mb-8 mt-5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="col-span-1 lg:col-span-8">
@@ -35,7 +36,7 @@ const PostDetails = ({ post }) => {
             </div>
           </div>
         </div>
-      </>
+        </>
     );
   }
 

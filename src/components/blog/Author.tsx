@@ -13,7 +13,7 @@ const Author = ({ author }) => (
         height={100}
         width={100}
         className="align-middle rounded-full "
-        src={`${BASE_URL_MEDIAS}/${author.photo.url}`}
+        src={`${BASE_URL_MEDIAS}${author.photo.url}`}
       />
     </div>
     <h3 className="text-white mt-4 mb-4 text-xl font-bold">{author.name}</h3>

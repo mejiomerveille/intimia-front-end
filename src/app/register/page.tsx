@@ -1,10 +1,18 @@
 "use client";
 import type { NextPage } from "next";
 import { useFormik } from "formik";
+import { css } from "@emotion/react";
+import { BeatLoader } from "react-spinners";
 import * as Yup from "yup";
 import { useState } from 'react';
 import { register } from '../../app/services';
+import { useRouter } from "next/navigation";
 
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
 // Yup schema to validate the form
 const schema = Yup.object().shape({
   username: Yup.string().required(),
@@ -19,6 +27,9 @@ const schema = Yup.object().shape({
 const Signup: NextPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
 
   // Formik hook to handle the form state
   const formik = useFormik({
@@ -37,15 +48,19 @@ const Signup: NextPage = () => {
     // Handle form submission
     onSubmit: async ({ username,first_name,last_name, email, password, password2}) => {
       try {
+        setIsLoading(true); 
         const response = await register({ username, first_name,last_name, email, password ,password2});
         if (response) {
           setSuccessMessage('Inscription réussie !');
+          router.replace("login");
         } else {
           setErrorMessage('Erreur lors de l\'inscription.');
         }
       } catch (error) {
         console.error(error);
         setErrorMessage('Erreur lors de la communication avec le serveur.');
+      } finally {
+        setIsLoading(false); // Désactiver le loader
       }
     },
   });
@@ -127,7 +142,13 @@ const Signup: NextPage = () => {
           />
           {errors.password2 && touched.password2 && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.password2}</span>}
 
-          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2" type="submit">Submit</button>
+          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2" disabled={isLoading} type="submit"> 
+          {isLoading ? (
+            <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
+          ) : (
+            "Submit"
+          )}
+          </button>
         </form>
         {successMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{successMessage}</p>}
         {errorMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errorMessage}</p>}

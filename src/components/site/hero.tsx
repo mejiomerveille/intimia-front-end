@@ -1,5 +1,7 @@
 import VideoThumb from '../../../public/Sans titre.png'
 import ModalVideo from '@/components/site/modal-video'
+// import st from '../../../public/vsd.mp4';
+import { Video } from '@stream-io/video-react-sdk'
 
 export default function Hero() {
   return (
@@ -49,7 +51,7 @@ export default function Hero() {
             thumbWidth={768}
             thumbHeight={432}
             thumbAlt="Modal video thumbnail"
-            video="/videos/video.mp4"
+            video="../../../public/Capture vidéo du 06-02-2024 15:57:41.webm"
             videoWidth={1920}
             videoHeight={1080} />
 

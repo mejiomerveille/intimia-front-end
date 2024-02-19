@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { submitComment } from '../../app/services';
+import { css } from "@emotion/react";
+import { BeatLoader } from "react-spinners";
 
 const CommentsForm = ({ slug }) => {
 // verifie si lutilisateur est connecte ou pas
 
 const [user, setUser] = useState(null);
+
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
+
 
 useEffect(() => {
   const fetchUserInfo = async () => {
@@ -42,6 +51,7 @@ useEffect(() => {
   const [error, setError] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [formData, setFormData] = useState({ comment: null, storeData: false });
+  const [isLoading, setIsLoading] = useState(false);
 
   const onInputChange = (e) => {
     const { target } = e;
@@ -59,6 +69,7 @@ useEffect(() => {
   };
 
   const handlePostSubmission = () => {
+    setIsLoading(true); 
     setError(false);
     const { comment, storeData } = formData;
     if (!comment) {
@@ -84,7 +95,7 @@ useEffect(() => {
         }
       });
   };
-  if (user) {
+  //if (user) {
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-8 pb-12 mb-8">
@@ -100,12 +111,18 @@ useEffect(() => {
       </div>
       {error && <p className="text-xs text-red-500">All fields are mandatory</p>}
       <div className="mt-8">
-        <button type="button" onClick={handlePostSubmission} className="transition duration-500 ease hover:bg-indigo-900 inline-block bg-pink-600 text-lg font-medium rounded-full text-white px-8 py-3 cursor-pointer">Post Comment</button>
+        <button type="button" onClick={handlePostSubmission} className="transition duration-500 ease hover:bg-indigo-900 inline-block bg-pink-600 text-lg font-medium rounded-full text-white px-8 py-3 cursor-pointer">
+          {isLoading ? (
+            <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
+          ) : (
+            "Post Comment"
+          )}
+          </button>
         {showSuccessMessage && <span className="text-xl float-right font-semibold mt-3 text-green-500">Comment submitted for review</span>}
       </div>
     </div>
   );
-} else {
+/*/} else {
   return (
     <div className="bg-white shadow-lg rounded-lg p-8 pb-12 mb-8">
       <div className="grid grid-cols-1 gap-4 mb-4">
@@ -118,7 +135,7 @@ useEffect(() => {
       </div>
     </div>
   );
-}
+}*/
 };
 
 export default CommentsForm;

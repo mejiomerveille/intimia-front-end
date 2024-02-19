@@ -3,7 +3,7 @@ import Image from 'next/image';
 import moment from 'moment';
 import Link from 'next/link';
 import la from '../../../public/logo.jpeg'
-
+import { BASE_URL_MEDIA } from '../../app/services';
 
 const CategorieCard = ({ post }) => {
   return(

@@ -87,10 +87,8 @@ export default function Testimonials() {
                 <blockquote className="text-xl font-medium mb-4">
                   “ I love this product and would recommend it to anyone. Could be not easier to use, and our multiple websites are wonderful. We get nice comments all the time. “
                 </blockquote>
-                <cite className="block font-bold text-lg not-italic mb-1">Darya Finger</cite>
-                <div className="text-gray-600">
-                  <span>CEO & Co-Founder</span> <a className="text-blue-600 hover:underline" href="#0">@Dropbox</a>
-                </div>
+                {/* <cite className="block font-bold text-lg not-italic mb-1">Darya Finger</cite> */}
+               
               </div>
 
             </div>

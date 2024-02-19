@@ -6,7 +6,13 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useState } from 'react';
 import { login } from "@/app/services";
+import { css } from "@emotion/react";
+import { BeatLoader } from "react-spinners";
 
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
 const schema = Yup.object().shape({
   username: Yup.string().required(),
   password: Yup.string().required().min(8),
@@ -16,6 +22,8 @@ const Signin: NextPage = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const formik = useFormik({
     initialValues: {
@@ -28,6 +36,7 @@ const Signin: NextPage = () => {
     // Handle form submission
     onSubmit: async ({ username, password}) => {
       try {
+        setIsLoading(true); 
         const response = await login({ username, password });
         if (response) {
           console.log(response)
@@ -39,6 +48,8 @@ const Signin: NextPage = () => {
       } catch (error) {
         console.error(error);
         setErrorMessage('Erreur lors de la communication avec le serveur.');
+      } finally {
+        setIsLoading(false); // Désactiver le loader
       }
     },
   });
@@ -69,8 +80,13 @@ const Signin: NextPage = () => {
           />
           {errors.password && touched.password && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.password}</span>}
 
-          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
-            Login
+          <button disabled={isLoading} className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
+          {isLoading ? (
+            <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
+          ) : (
+            "Submit"
+          )}
+          
           </button>
           
           <Link className="text-sm mt-3 text-right" href={"/register"}>

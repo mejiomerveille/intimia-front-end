@@ -1,83 +1,101 @@
 "use client";
-
+import type { NextPage } from "next";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { registerrdv } from '../../app/services';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { css } from "@emotion/react";
+import { BeatLoader } from "react-spinners";
 
 
-export default function RegisterRdvForm() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [username, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [first_name, setFirstName] = useState("");
-  const [last_name, setLastName] = useState("");
-  const [password2, setPassword2] = useState("");
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
+
+
+// Yup schema to validate the form
+const schema = Yup.object().shape({
+  name: Yup.string().required(),
+  profession: Yup.string().required(),
+  email: Yup.string().required().email(),
+  date: Yup.string().required(),
+  time: Yup.string().required(),
+  weight: Yup.string(),
+  reminder: Yup.string(),
+  notes: Yup.string(),
+
+});
+
+const RegisterRdvForm: NextPage = () =>{
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // Formik hook to handle the form state
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      profession: "",
+      email: "",
+      date: "",
+      time: "",
+      weight: "",
+      reminder: "",
+      notes: "",
+    },
 
-    if (!username || !email || !password || !first_name || !password2 || !last_name ) {
-      setError("All fields are necessary.");
-      return;
-    }
+    // Pass the Yup schema to validate the form
+    validationSchema: schema,
 
-    try {
-
-      const response = await fetch("http://127.0.0.1:8000/api/register/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          'Accept': 'application/json'
-
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          first_name,
-          last_name,
-          password,
-          password2,
-        }),
-      });
-        if (response.ok) {
-            const data = await response.json()
-            console.log(data)
-            router.push("/");
-
+    onSubmit: async ({ name,profession,email, date, time, weight,reminder,notes}) => {
+      try {
+        const response = await registerrdv({ name, profession,email, date, time ,weight,reminder,notes});
+        setIsLoading(true); 
+        if (response) {
+          setSuccessMessage('Enregistrement réussie !');
+          router.replace("rdv/rdv-list");
+        } else {
+          setErrorMessage('Erreur de l\'enregistrement.');
         }
-        else {
-            const error = await response.json()
-            console.log(error);
-            if (response.status === 400) {
-                error.value = error
-            }
-        }
-        
-    }
-    catch (error) {
-        console.log(error)
-    }
-  };
-//  const modal(){
-  // return(
-    // <h1>etes vous sure de vouloir modifier ce rendez-vous?</h1>
-  // )
-//  }
+      } catch (error) {
+        console.error(error);
+        setErrorMessage('Erreur lors de la communication avec le serveur.');
+      }finally {
+        setIsLoading(false); // Désactiver le loader
+      }
+    },
+  });
+
+  // Destructure the formik object
+  const { errors, touched, values, handleChange, handleSubmit } = formik;
+
+
+    
   return (
-    <div className="border-blue-400">
+    <div className="border-blue-400 mt-16">
     <div className="grid place-items-center h-screen">
       <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400 bg-gray-50">
         <h1 className="text-xl font-bold my-4">Enregistrer un rendez-vous medical</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
-            onChange={(e) => setName(e.target.value)}
             type="text"
-            placeholder="Nom du rdv"
+            name="name"
+            value={values.name}
+            onChange={handleChange}
+            id="name"
+            placeholder="name"
           />
-          <select onChange={(e) => setEmail(e.target.value)}>
+          {errors.name && touched.name && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.name}</span>}
+
+          <select onChange={handleChange}
+            name="profession"
+            value={values.profession}
+            id="profession"
+            >
             <option value="">Sélectionnez le medecin</option>
             <option value="Gynecologue">Gynecologue</option>
             <option value="Visiteur medical">Visiteur medical</option>
@@ -88,52 +106,81 @@ export default function RegisterRdvForm() {
             <option value="Pediatre">Pediatre</option>
             <option value="Kinesitherapeute">Kinesitherapeute</option>
             <option value="Echographiste">Echographiste</option>
-
           </select>
+          {errors.profession && touched.profession && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.profession}</span>}
+
             <input
-            onChange={(e) => setEmail(e.target.value)}
             type="email"
-            placeholder="email"
-          />
+            name="email"
+            value={values.email}
+            onChange={handleChange}
+            id="email"
+            placeholder="Email"
+            />
+          {errors.email && touched.email && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.email}</span>}
           <input
-            onChange={(e) => setFirstName(e.target.value)}
-            type="number"
-            placeholder="Numero de telephone "
-          />
+             type="date"
+             name="date"
+             value={values.date}
+             onChange={handleChange}
+             id="date"
+             placeholder="date"
+             />
+           {errors.date && touched.date && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.date}</span>}
           <input
-            onChange={(e) => setLastName(e.target.value)}
-            type="date"
-            placeholder="date"
-          />
+             type="time"
+             name="time"
+             value={values.time}
+             onChange={handleChange}
+             id="time"
+             placeholder="time"
+             />
+           {errors.time && touched.time && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.time}</span>}
+           
+          <input
+             type="weight"
+             name="weight"
+             value={values.weight}
+             onChange={handleChange}
+             id="weight"
+             placeholder="weight"
+             />
+           {errors.email && touched.email && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.email}</span>}
+          {/* <label htmlFor="note">note</label> */}
+          <textarea
+          className="b-black"
+           name="notes"
+           value={values.notes}
+           onChange={handleChange}
+           id="notes"
+           placeholder="notes"
           
-          <input
-            onChange={(e) => setPassword(e.target.value)}
-            type="time"
-            placeholder="heure"
           />
-          <label htmlFor="note">note</label>
-          <textarea/>
           <div className="flex"> 
           <label htmlFor="Me rappeler">Me rappeler</label>
-          <input
-            onChange={(e) => setPassword2(e.target.value)}
+          <input className="flex"
             type="checkbox"
-            placeholder="Me rappeler"
+            name="reminder"
+            value={values.reminder}
+            onChange={handleChange}
+            id="reminder"
+            placeholder="reminder"
+ 
           />
           </div>
           <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
-
-            Enregistrer le rdv
-          </button>
-
-          {error && (
-            <div className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
-              {error}
-            </div>
+          {isLoading ? (
+            <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
+          ) : (
+            "Enregistrer le rdv"
           )}
+          </button>
         </form>
+        {successMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{successMessage}</p>}
+        {errorMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errorMessage}</p>}
       </div>
     </div>
     </div>
   );
 }
+export default RegisterRdvForm;
