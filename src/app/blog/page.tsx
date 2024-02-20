@@ -1,5 +1,4 @@
 "use client";
-import BlogPage from "../../../pages/blogpage";
 import { FeaturedPosts } from "@/app/sections";
 import { getPosts } from "@/app/services";
 import { useState, useEffect } from 'react';
@@ -21,7 +20,7 @@ export default function blog(){
   }, []);
 
   return( 
-  <div className="container mx-auto px-10 mb-8 mt-20">
+  <div className="container mx-auto px-10 mb-8 mt-24">
   <FeaturedPosts />
   <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
     <div className="lg:col-span-8 col-span-1">
