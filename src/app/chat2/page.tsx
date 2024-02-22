@@ -180,3 +180,7 @@ export default function Home() {
     </main>
   );
 }
+// messages: [
+//   ...chatHistory,
+//   { role: 'assistant', content: userInput },
+// ],

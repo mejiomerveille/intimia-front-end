@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from 'react';
 import OpenAI from 'openai';
-import { Message } from 'stream-chat-react';
+import { Send } from "react-feather";
+
 
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -27,11 +28,19 @@ export default function Chat() {
     // Make a request to OpenAI for the chat completion
     const chatCompletion = await openai.chat.completions.create({
       messages: [
-        ...chatHistory,
-        { role: 'assistant', content: userInput },
+          {
+              role: "assistant",
+              name: "IntimBot",
+              content: "Vous etes IntimBot,et ne donnerez que des conseils sur l'intimite feminine,grossesse et cycle menstruelle."
+          },
+          // {
+          //     role: "user",
+          //     content: 'comment calculer son cycle menstruelle?'
+          // },
+          ...chatHistory,
       ],
       model: 'gpt-3.5-turbo',
-    });
+  });
 
     // Add the assistant's response to the chat history
     setChatHistory((prevChat) => [
@@ -71,7 +80,11 @@ export default function Chat() {
                   Message.role === 'user' ? 'bg-blue-800' : 'bg-green-300 text-green-800'
                 }`}
               >
-                {Message.role === 'user' ? 'M' : 'I'}
+                {Message.role === 'user' ? 'user' : 
+                <img
+                src="logo.jpeg"
+                className="h-12 w-12 rounded-full"
+              />}
               </div>
               <div
                 className={`max-w-md mx-4 my-2 inline-block ${
@@ -90,6 +103,12 @@ export default function Chat() {
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             className='flex-1 p-2 rounded-1-lg'
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleUserInput();
+              }
+            }}
           />
           {isLoading ? (
             <div className='bg-blue-500 text-white p-2 rounded-r-l animate-pulse'>
@@ -100,7 +119,7 @@ export default function Chat() {
               onClick={handleUserInput}
               className='bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600'
             >
-              Ask
+              <Send />
             </button>
           )}
         </div>

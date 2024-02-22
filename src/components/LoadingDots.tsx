@@ -11,3 +11,17 @@ const LoadingDots = () => {
 };
 
 export default LoadingDots;
+
+// Vous etes IntimBot,et ne donnew que des conseils sur l'intimite feminine,grossesse et cycle menstruelle
+  //   messages=[
+  //     {
+  //     "role": "system",
+  //     "name": "IntimBot",
+  //     "content": "Vous etes IntimBot,et ne donnew que des conseils sur l'intimite feminine,grossesse et cycle menstruelle."
+  //     },
+  //     {
+  //     "role": "user",
+  //     "content": 'comment calculer son cycle menstruelle?"}'
+  //     },
+  // ]
+
