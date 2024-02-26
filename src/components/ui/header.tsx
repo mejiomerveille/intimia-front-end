@@ -1,4 +1,5 @@
-'use client'
+"use client";
+
 import Logo from '../../../public/logo.jpeg'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'

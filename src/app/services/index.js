@@ -265,3 +265,12 @@ export const getrdv = async () => {
     return null;
   }
 };
+
+export const registerMedecin = async (medecinData) => {
+  try {
+    const response = await axios.post('', medecinData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

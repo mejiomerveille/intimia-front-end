@@ -7,11 +7,9 @@ import Modal from 'react-modal';
 import { useRouter } from "next/navigation";
 import { css } from "@emotion/react";
 import { BeatLoader } from "react-spinners";
+import { list } from "postcss";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Link from "next/link";
-import { CloseIcon } from "stream-chat-react";
-
   
 
 const override = css`
@@ -47,18 +45,13 @@ const RegisterRdvForm: NextPage = () =>{
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedMedecinId, setSelectedMedecinId] = useState("");
-  const [medecins, setMedecins] = useState([]);
-    const [modalOpen, setModalOpen] = useState(false);
-    const handleClick = () => {
-      setModalOpen(true);
-      
-    };
-  
 
   // Formik hook to handle the form state
   const formik = useFormik({
     initialValues: {
+      // name: "",
+      // profession: "",
+      // email: "",
       date: "",
       time: "",
       weight: "",
@@ -71,28 +64,21 @@ const RegisterRdvForm: NextPage = () =>{
 
     onSubmit: async ({ date, time, weight,reminder,notes}) => {
       try {
-        const response = await registerrdv({
-          medecinId: selectedMedecinId,
-          date,
-          time,
-          weight,
-          reminder,
-          notes,
-        });
+        const response = await registerrdv({  date, time ,weight,reminder,notes});
         setIsLoading(true); 
         if (response) {
-          // messageRdv("success","Enregistrement réussie !",response)
-          setSuccessMessage('Enregistrement réussie !');
+          messageRdv("success","Enregistrement réussie !",response)
+          // setSuccessMessage('Enregistrement réussie !');
           router.replace("rdv/rdv-list");
         } else {
-          setErrorMessage('Erreur de l\'enregistrement.');
-          // messageRdv("error","Erreur de l\'enregistrement!" ,"")
+          // setErrorMessage('Erreur de l\'enregistrement.');
+          messageRdv("error","Erreur de l\'enregistrement!" ,"")
 
         }
       } catch (error) {
         console.error(error);
-        // messageRdv("error","Erreur lors de la communication avec le serveur!" ,"")
-        setErrorMessage('Erreur lors de la communication avec le serveur.');
+        messageRdv("error","Erreur lors de la communication avec le serveur!" ,"")
+        // setErrorMessage('Erreur lors de la communication avec le serveur.');
       }finally {
         setIsLoading(false); // Désactiver le loader
       }
@@ -102,14 +88,13 @@ const RegisterRdvForm: NextPage = () =>{
   // Destructure the formik object
   const { errors, touched, values, handleChange, handleSubmit } = formik;
   
-    
+    const [medecins, setMedecins] = useState([]);
+  
     useEffect(() => {
       const fetchMedecins = async () => {
         try {
           const response = await axios.get('http://localhost:8000/api/v1/rdv/medecins/');
           setMedecins(response.data);
-          const currentUrl = router.asPath;
-          const url = localStorage.setItem('URL1',currentUrl) ;
         } catch (error) {
           console.error(error);
         }
@@ -118,11 +103,6 @@ const RegisterRdvForm: NextPage = () =>{
       fetchMedecins();
     }, []);
 
-    const handleSelectMedecin = (medecin) => {
-      setSelectedMedecinId(medecin.id);
-      setModalOpen(false);
-    };
-
     
   return (
     <div className="border-blue-400 mt-16">
@@ -130,15 +110,15 @@ const RegisterRdvForm: NextPage = () =>{
       <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400 bg-gray-50">
         <h1 className="text-xl font-bold my-4">Enregistrer un rendez-vous medical</h1>
 
-        <button className="bg-green-600 text-white font-bold rounded-full cursor-pointer px-6 py-2 mb-4 " onClick={handleClick} >
+        <button className="bg-green-600 text-white font-bold rounded-full cursor-pointer px-6 py-2 mb-4">
           {isLoading ? (
-            <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
+            <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} isOpen={true}/>
           ) : (
             "Selectionner votre medecin"
           )}
           
           </button>
-          <Modal isOpen={modalOpen}
+          <Modal isOpen={true}
           style={{
             overlay: {
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -153,12 +133,7 @@ const RegisterRdvForm: NextPage = () =>{
             },
           }}>
         <div>
-          <div className="flex justify-between">
-            <h1 className="text-2xl font-bold mb-4">Liste des médecins</h1>
-            <button onClick={() => setModalOpen(false)}>
-            <CloseIcon />
-            </button>
-          </div>
+      <h1 className="text-2xl font-bold mb-4">Liste des médecins</h1>
       <table className="border-collapse w-full">
         <thead>
           <tr>
@@ -166,7 +141,7 @@ const RegisterRdvForm: NextPage = () =>{
             <th className="py-2 px-4 border-b">Profession</th>
             <th className="py-2 px-4 border-b">Téléphone</th>
             <th className="py-2 px-4 border-b">Email</th>
-            <th className="py-2 px-4 border-b">Actions</th> 
+            <th className="py-2 px-4 border-b">Actions</th> {/* Nouvelle colonne pour les actions */}
           </tr>
         </thead>
         <tbody>
@@ -188,13 +163,49 @@ const RegisterRdvForm: NextPage = () =>{
           ))}
         </tbody>
       </table>
-      <div className="flex justify-center mt-8">
-        <Link href="/medecin" className="transition duration-500 ease-in-out hover:bg-indigo-900 inline-block bg-pink-600 text-lg font-medium rounded-full text-white px-4 py-2 cursor-pointer">Ajouter un medecin</Link>
-       </div>
+
+      
     </div>
   
       </Modal>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {/* <input
+            type="text"
+            name="name"
+            value={values.name}
+            onChange={handleChange}
+            id="name"
+            placeholder="name"
+          />
+          {errors.name && touched.name && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.name}</span>}
+
+          <select onChange={handleChange}
+            name="profession"
+            value={values.profession}
+            id="profession"
+            >
+            <option value="">Sélectionnez le medecin</option>
+            <option value="Gynecologue">Gynecologue</option>
+            <option value="Visiteur medical">Visiteur medical</option>
+            <option value="Sage-femme">Sage-femme</option>
+            <option value="Infirmiere">Infirmiere</option>
+            <option value="Obstetricien">Obstetricien</option>
+            <option value="Autre">Autre</option>
+            <option value="Pediatre">Pediatre</option>
+            <option value="Kinesitherapeute">Kinesitherapeute</option>
+            <option value="Echographiste">Echographiste</option>
+          </select>
+          {errors.profession && touched.profession && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.profession}</span>}
+
+            <input
+            type="email"
+            name="email"
+            value={values.email}
+            onChange={handleChange}
+            id="email"
+            placeholder="Email"
+            />
+          {errors.email && touched.email && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.email}</span>} */}
           <input
              type="date"
              name="date"

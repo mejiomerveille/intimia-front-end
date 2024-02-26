@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import OpenAI from 'openai';
 import { Send } from "react-feather";
-
+import { content } from '@/components/utils/infoContent';
+import Cookies from 'js-cookie';
 
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -26,12 +27,13 @@ export default function Chat() {
     ]);
 
     // Make a request to OpenAI for the chat completion
+    
     const chatCompletion = await openai.chat.completions.create({
       messages: [
           {
               role: "assistant",
               name: "IntimBot",
-              content: "Vous etes IntimBot,et ne donnerez que des conseils sur l'intimite feminine,grossesse et cycle menstruelle."
+              content: content
           },
           // {
           //     role: "user",
@@ -50,6 +52,25 @@ export default function Chat() {
         content: chatCompletion.choices[0].message.content,
       },
     ]);
+    const token = localStorage.getItem('access_token');
+    const csrftoken = Cookies.get('csrftoken');
+    console.log(csrftoken)
+
+
+    // Envoie de la conversation au backend
+  await fetch('http://localhost:8000/api/v1/chatbot/save-conversation/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrftoken, 
+      'Accept': 'application/json',
+      'Authorization' :`Bearer ${token}`
+    },
+    body: JSON.stringify({
+      user_input: userInput,
+      assistant_response: chatCompletion.choices[0].message.content,
+    }),
+  });
 
     // Clear the user input field and end the loading state
     setUserInput('');
@@ -64,7 +85,7 @@ export default function Chat() {
             Intmia Chatbot 
           </div>
           <p className='text-gray-600 text-lg'>
-            Welcome to the intimiaChatBot. Ask me anything!!!
+            Welcome to the intimiaChatBot. Ask me anything about intimacy, pregnancy, menstruation, or any related topics!!!
           </p>
         </div>
         <div className='mb-4' style={{ height: '400px', overflow: 'auto' }}>
@@ -77,7 +98,7 @@ export default function Chat() {
             >
               <div
                 className={`rounded-full p-2 max-w-md mx-4 inline-block ${
-                  Message.role === 'user' ? 'bg-blue-800' : 'bg-green-300 text-green-800'
+                  Message.role === 'user' ? 'bg-blue-800' : 'bg-white text-white'
                 }`}
               >
                 {Message.role === 'user' ? 'user' : 

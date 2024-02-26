@@ -23,10 +23,10 @@ const RDVList = () => {
         setIsLoading(true);
         const response = await getrdv();
         if (response) {
-          setSuccessMessage('Connexion réussie !');
+          setSuccessMessage('reccuperation réussie !');
           setGrossesse(response);
         } else {
-          setErrorMessage('Erreur lors de la connexion.');
+          setErrorMessage('Erreur lors de la reccuperation des rendez-vous.');
         }
       } catch (error) {
         console.error(error);
