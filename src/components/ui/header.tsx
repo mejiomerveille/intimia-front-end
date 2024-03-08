@@ -1,5 +1,4 @@
-"use client";
-
+'use client'
 import Logo from '../../../public/logo.jpeg'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -53,11 +52,12 @@ render(){
 
           <nav className="hidden md:flex md:grow">
             <ul className="flex grow justify-end flex-wrap items-center">
-            <li>
-                <Link href="/blog" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">Blog</Link>
-              </li>
+           
              {this.state.token == undefined?(
               <>
+               <li>
+                <Link href="/blog" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">Blog</Link>
+              </li>
               <li>
                 <Link href="/login" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">Se connecter</Link>
               </li>
@@ -72,14 +72,17 @@ render(){
               </>
              ):(
               <>
-            <li>
-                <Link href="/suivie" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">suivie</Link>
+              <li>
+                <Link href="/" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">Accueil</Link>
               </li>
               <li>
-                <Link href="/" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">home</Link>
+                <Link href="/suivie" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">Suivie</Link>
               </li>
               <li>
-                <Link href="/chat" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">chat</Link>
+                <Link href="/blog" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">Blog</Link>
+              </li>
+              <li>
+                <Link href="/chat" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">ChatBot</Link>
               </li>
 
               <li>
@@ -104,9 +107,7 @@ render(){
 
               </>
              )}
-              
-
-
+             
             </ul>
 
           </nav>

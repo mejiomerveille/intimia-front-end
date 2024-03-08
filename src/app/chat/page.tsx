@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import OpenAI from 'openai';
 import { Send } from "react-feather";
 import { content } from '@/components/utils/infoContent';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -53,8 +53,8 @@ export default function Chat() {
       },
     ]);
     const token = localStorage.getItem('access_token');
-    const csrftoken = Cookies.get('csrftoken');
-    console.log(csrftoken)
+    // const csrftoken = Cookies.get('csrftoken');
+    // console.log(csrftoken)
 
 
     // Envoie de la conversation au backend
@@ -62,7 +62,7 @@ export default function Chat() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRFToken': csrftoken, 
+      // 'X-CSRFToken': token, 
       'Accept': 'application/json',
       'Authorization' :`Bearer ${token}`
     },

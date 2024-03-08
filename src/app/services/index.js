@@ -268,7 +268,8 @@ export const getrdv = async () => {
 
 export const registerMedecin = async (medecinData) => {
   try {
-    const response = await axios.post('', medecinData);
+    const response = await axios.post('rdv/add_medecins/', medecinData);
+    console.log(response.data)
     return response.data;
   } catch (error) {
     throw error.response.data;

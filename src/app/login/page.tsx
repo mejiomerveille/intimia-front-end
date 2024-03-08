@@ -93,7 +93,7 @@ const Signin: NextPage = () => {
             Don&apos;t have an account? <span className="underline">Register</span>
           </Link>
         </form>
-        {successMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{successMessage}</p>}
+        {successMessage && <p className="bg-green-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{successMessage}</p>}
         {errorMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errorMessage}</p>}
       </div>
     </div>

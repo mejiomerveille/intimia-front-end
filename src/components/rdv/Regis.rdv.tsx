@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { registerrdv } from '../../app/services';
 import Modal from 'react-modal';
 import { useRouter } from "next/navigation";
+// import { useRouter } from "next/router";
 import { css } from "@emotion/react";
 import { BeatLoader } from "react-spinners";
 import React, { useState, useEffect } from 'react';
@@ -19,14 +20,14 @@ const override = css`
   margin: 0 auto;
 `;
 
-const messageRdv=(status:string,message:string,data:string)=>{
-    messageError:[{
-      status:"status",
-      message:"message",
-      data:"data",
-    }]
+// const messageRdv=(status:string,message:string,data:string)=>{
+//     messageError:[{
+//       status:"status",
+//       message:"message",
+//       data:"data",
+//     }]
 
-}
+// }
 
 
 // Yup schema to validate the form
@@ -43,14 +44,15 @@ const schema = Yup.object().shape({
 });
 
 const RegisterRdvForm: NextPage = () =>{
+  const router = useRouter();
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMedecinId, setSelectedMedecinId] = useState("");
+  const [selectedMedecin, setSelectedMedecin] = useState("");
   const [medecins, setMedecins] = useState([]);
-    const [modalOpen, setModalOpen] = useState(false);
-    const handleClick = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleClick = () => {
       setModalOpen(true);
       
     };
@@ -95,6 +97,8 @@ const RegisterRdvForm: NextPage = () =>{
         setErrorMessage('Erreur lors de la communication avec le serveur.');
       }finally {
         setIsLoading(false); // Désactiver le loader
+        setSuccessMessage('');
+        setErrorMessage('');
       }
     },
   });
@@ -120,6 +124,7 @@ const RegisterRdvForm: NextPage = () =>{
 
     const handleSelectMedecin = (medecin) => {
       setSelectedMedecinId(medecin.id);
+      setSelectedMedecin(medecin.name);
       setModalOpen(false);
     };
 
@@ -129,19 +134,46 @@ const RegisterRdvForm: NextPage = () =>{
     <div className="grid place-items-center h-screen">
       <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400 bg-gray-50">
         <h1 className="text-xl font-bold my-4">Enregistrer un rendez-vous medical</h1>
-
-        <button className="bg-green-600 text-white font-bold rounded-full cursor-pointer px-6 py-2 mb-4 " onClick={handleClick} >
-          {isLoading ? (
-            <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
-          ) : (
-            "Selectionner votre medecin"
-          )}
-          
-          </button>
+        {selectedMedecin?(
+          // <label htmlFor="selectedMedecin">{selectedMedecin}</label>
+          <input
+             type="text"
+             name="selectedMedecin"
+             value={selectedMedecin}
+             onChange={handleChange}
+             id="selectedMedecin"
+             onClick={handleClick}
+             placeholder="selectedMedecin"
+             />
+                          ) : (
+                              <>
+                                  <button className="bg-green-600 text-white font-bold rounded-full cursor-pointer px-6 py-2 mb-4 " onClick={handleClick} >
+                                    {isLoading ? (
+                                      <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
+                                    ) : (
+                                      "Selectionner votre medecin"
+                                    )}
+                                    
+                                    </button>
+                              </>
+                  )
+        }
           <Modal isOpen={modalOpen}
           style={{
+            // overlay: {
+            //   backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            // },
+            // content: {
+            //   top: '50%',
+            //   left: '50%',
+            //   right: 'auto',
+            //   bottom: 'auto',
+            //   marginRight: '-50%',
+            //   transform: 'translate(-50%, -50%)',
+            // },
             overlay: {
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              zIndex: 1000,
             },
             content: {
               top: '50%',
@@ -150,6 +182,9 @@ const RegisterRdvForm: NextPage = () =>{
               bottom: 'auto',
               marginRight: '-50%',
               transform: 'translate(-50%, -50%)',
+              // width: '400px',
+              maxHeight: '400px',
+              overflowY: 'auto',
             },
           }}>
         <div>
