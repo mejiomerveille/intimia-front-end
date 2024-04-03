@@ -1,12 +1,11 @@
-import RegisterRdvForm from "@/components/rdv/Regis.rdv";
+import Rendez_vous from "@/components/rdv/enregi";
 
 
 export default function RegisRdv(){
 
     return(  
         <div>
-
-            <RegisterRdvForm/>
+            <Rendez_vous/>
         </div>      
     );
 }

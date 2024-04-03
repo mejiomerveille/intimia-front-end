@@ -8,6 +8,11 @@ const Headline = ({title}) =>{
             <h1 className="text-gray-600 uppercase text-2xl">{title}</h1>
             <div className="bg-green-600 w-[100px] h-[2px]"></div>
         </div>
+        // <Hero />
+        // <Features />
+        // <FeaturesBlocks />
+        // <Testimonials />
+        // <Newsletter />
     );
 }
 

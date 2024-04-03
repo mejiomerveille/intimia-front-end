@@ -3,13 +3,21 @@ import axios from 'axios';
 export const BASE_URL = 'http://127.0.0.1:8000/api/v1/';
 
 export const BASE_URL_MEDIA = 'http://127.0.0.1:8000/media';
+export const BASE_URL_MEDI = 'http://127.0.0.1:8000/media/media/bg.png';
+export const BASE_URL_ME = 'http://127.0.0.1:8000/media/media/ff.png';
+export const BASE_URL_M = 'http://127.0.0.1:8000/media/media/bg1.jpeg';
+export const BASE_URL_ = 'http://127.0.0.1:8000/media/media/bg2.jpeg';
+export const BAS_URL_ = 'http://127.0.0.1:8000/media/media/bg3.jpeg';
+export const BASE_URL_MED = 'http://127.0.0.1:8000/media/media/bg5.png';
 export const BASE_URL_MEDIAS = 'http://127.0.0.1:8000';
 
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
 });
-
+const axiosInstance1 = axios.create({
+  baseURL: BASE_URL,
+});
 
 
 axiosInstance.interceptors.request.use(function (config) {
@@ -25,12 +33,18 @@ axiosInstance.interceptors.request.use(function (config) {
   return Promise.reject(error);
 });
 
+axiosInstance1.interceptors.request.use(function (config) {
+  // Running on client. Attach token to header.
+  return config;
+}, function (error) {
+  return Promise.reject(error);
+});
+
 
 export async function getPosts() {
   try {
-    const response = await axiosInstance.get('blog/posts/');
+    const response = await axiosInstance1.get('blog/posts/');
     if (response.status === 200) {
-      // console.log(response.data)
       return response.data;
     } else {
       console.error('Erreur lors de la requête');
@@ -44,9 +58,8 @@ export async function getPosts() {
 
 export const getCategories = async () => {
   try {
-    const response = await axiosInstance.get('blog/category/all');
+    const response = await axiosInstance1.get('blog/category/all');
     if (response.status === 200) {
-      // console.log(response.data)
       return response.data;
     } else {
       console.error('Erreur lors de la requête');
@@ -121,7 +134,7 @@ export const getCategoryPost = async (slug) => {
 
 export const getFeaturedPosts = async () => {
   try {
-    const response = await axiosInstance.get(`blog/posts/featured/`, {
+    const response = await axiosInstance1.get(`blog/posts/featured/`, {
       params: {
         featured: true,
       },
@@ -156,7 +169,7 @@ export const getComments = async (slug) => {
 
 export const getRecentPosts = async () => {
   try {
-    const response = await axiosInstance.get(`blog/posts/recent/`, {
+    const response = await axiosInstance1.get(`blog/posts/recent/`, {
       params: {
         limit: 3,
       },
@@ -175,13 +188,6 @@ export const registerGrossesse = (data) => {
 export const updateGrossesse = (data,pk) => {
   return axiosInstance.put(`grossesse/edit/${pk}`, data);
 }
-
-export const getGrossesse = (pk) => {
-  return axiosInstance.get(`grossesse/get/${pk}`);
-}
-
-
-// utilisateur
 
 
 export const logout = async () => {
@@ -216,6 +222,24 @@ export const login = async (data) => {
     return null;
   }
 };
+
+export const verifyLogin = async () => {
+  try {
+    const token = localStorage.getItem('access_token');
+    const response = await axiosInstance.post('user/login/verify/', { token });
+    console.log(response);
+    return response;
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.detail) {
+      console.log(error.response.data.detail);
+    } else {
+      console.error(error);
+    }
+    return null;
+  }
+};
+
+verifyLogin();
 
 export const register = async (obj) => {
   try {
@@ -252,13 +276,32 @@ export const registerrdv = async (obj) => {
     return null;
   }
 };
-// http://localhost:8000/api/v1/rdv/ajout/
 
 
 export const getrdv = async () => {
   try {
     const response = await axiosInstance.get(`rdv/get/`);
     // localStorage.setItem('id', response.data.id)
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const updaterdv = async (id) => {
+  try {
+    const response = await axiosInstance.put(`rdv/update/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export const deleterdv = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`rdv/${id}/delete`);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -275,3 +318,107 @@ export const registerMedecin = async (medecinData) => {
     throw error.response.data;
   }
 };
+
+
+export async function getMedecins() {
+  try {
+    const response = await axiosInstance.get('rdv/medecins/');
+    if (response.status === 200) {
+      // console.log(response.data)
+      return response.data;
+    } else {
+      console.error('Erreur lors de la requête');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+
+
+export async function currentWeek() {
+  // let id_grossesse=localStorage.getItem(selectedGrossesseId)
+  // console.log(id_grossesse)
+  try {
+    const response = await axiosInstance.get(`grossesse/week/`);
+    if (response.status === 200) {
+      // localStorage.setItem('numSemaine', response.data.week)
+      // console.log(response.data)
+      return response.data;
+    } else {
+      console.error('Erreur lors de la requête');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+
+export async function getSemaine() {
+  const numSemaine=localStorage.setItem('numSemaine', response.data.week)
+  console.log(numSemaine)
+  try {
+    const response = await axiosInstance.get(`grossesse/semaine/${1}`);
+    if (response.status === 200) {
+      console.log(response.data)
+      return response.data;
+    } else {
+      console.error('Erreur lors de la requête');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+
+export async function getGrossesse() {
+  try {
+    const response = await axiosInstance.get('grossesse/list/');
+    if (response.status === 200) {
+      // console.log(response.data)
+      return response.data;
+    } else {
+      console.error('Erreur lors de la requête');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+
+export const registernotes = async (obj) => {
+  try {
+    const response = await axiosInstance.post(`notes/create/`, obj);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+export async function getNotes() {
+  try {
+    const response = await axiosInstance.get('notes/get_notes/');
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      console.error('Erreur lors de la requête');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+
+// useEffect(() => {
+//   const fetchSemaineInfo = async () => {
+//     try {
+//       const response = await axios.get(`http://127.0.0.1:8000/api/v1/grossesse/semaine/${numSemaine}`);
+//       setSemaineInfo(response.data);
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   };
+
+//   fetchSemaineInfo();
+// }, [numSemaine]);

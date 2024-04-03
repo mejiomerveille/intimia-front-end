@@ -2,17 +2,39 @@
 import { BsFillArrowRightCircleFill, BsFillArrowLeftCircleFill } from "react-icons/bs";
 import React, { useState, useEffect } from "react";
 import axios from "axios"; 
-import { BASE_URL_MEDIAS,BASE_URL } from "@/app/services";
+import { BASE_URL_MEDIAS,BASE_URL ,currentWeek} from "@/app/services";
 
 export default function EvolutionGrossesseForm() {
   const [numSemaine, setNumSemaine] = useState(1);
   const [semaineInfo, setSemaineInfo] = useState({});
 
   useEffect(() => {
+    currentWeek()
+      .then(response => {
+        setNumSemaine(response.start_week);
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération de semaine:', error);
+      });
+  }, []);
+
+  // useEffect(() => {
+  //   getSemaine()
+  //     .then(response => {
+  //       setSemaineInfo(response.data);
+  //       console.log(response.data);
+  //     })
+  //     .catch(error => {
+  //       console.error('Erreur lors de la récupération des grossesses:', error);
+  //     });
+  // }, [numSemaine]);
+
+  useEffect(() => {
     const fetchSemaineInfo = async () => {
       try {
         const response = await axios.get(`http://127.0.0.1:8000/api/v1/grossesse/semaine/${numSemaine}`);
         setSemaineInfo(response.data);
+        // console.log(response.data.Votre_bebe)
       } catch (error) {
         console.error(error);
       }
@@ -29,7 +51,7 @@ export default function EvolutionGrossesseForm() {
   };
 
   const handleNextWeek = () => {
-    if (numSemaine < 42) {
+    if (numSemaine < 41) {
       setNumSemaine(numSemaine + 1);
     }
   };
@@ -51,6 +73,8 @@ export default function EvolutionGrossesseForm() {
                 <h1 className="text-xl">photo de bébé</h1>
                 <div className="mx-auto" style={{ width: "220px", height: "420px" }}>
                   <img src={`${BASE_URL_MEDIAS}/${semaineInfo.photoBebe}`}  alt="photo" />
+                  {/* <h3>Vous etes a la {numSemaine} semaines</h3>
+                  <h3>plus que {41-numSemaine} semaines</h3> */}
                 </div>
               </div>
               <div>
@@ -76,11 +100,17 @@ export default function EvolutionGrossesseForm() {
           </button>
         </div>
  
-      <div className="instruction">
-            <div className="card text-dark bg-info " >
+      <div className="instruction ">
+            <div className="card text-dark mb-96" >
                 <div className="card-body">
+                  {semaineInfo.Votre_bebe !=undefined?(  
+                    <>
                     <h2 className="card-title">Votre bebe</h2>
                     <h5 className="card-text">{semaineInfo.Votre_bebe}</h5>
+                    </> 
+                  ):(
+                    <div></div>
+                  )}
                 </div>
                 <div className="card-body">
                     <h2 className="card-title">Votre corps</h2>
@@ -93,6 +123,16 @@ export default function EvolutionGrossesseForm() {
                 <div className="card-body">
                     <h2 className="card-title">Info pour le partenaire</h2>
                     <h5 className="card-text">{semaineInfo.Info}</h5>
+                </div>
+                <div className="card-body">
+                {semaineInfo.Infojumeaux !=undefined?(  
+                    <>
+                    <h2 className="card-title">Info jumeaux/ Naissances multiples</h2>
+                    <h5 className="card-text">{semaineInfo.Infojumeaux}</h5>
+                    </> 
+                  ):(
+                    <div></div>
+                  )}
                 </div>
             </div>
         </div>

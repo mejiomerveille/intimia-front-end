@@ -4,8 +4,6 @@ import moment from 'moment';
 import { useEffect } from "react";
 import { BASE_URL_MEDIAS } from '../../app/services';
 
-
-
 const PostDetail = ({ post }) => {
   const router = useRouter();
   const currentUrl = router.asPath;

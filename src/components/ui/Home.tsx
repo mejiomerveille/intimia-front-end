@@ -1,40 +1,42 @@
 'use client';
-import Hero from '@/components/site/hero'
-import Features from '@/components/site/features'
-import FeaturesBlocks from '@/components/site/features-blocks'
-import Testimonials from '@/components/site/testimonials'
-import Newsletter from '@/components/site/newsletter'
-import React from 'react'
+import React ,{useState,useEffect} from 'react'
 import EvolutionGrossesseForm from '@/components/grossesse/HomeGrossesse'
+import Accuiel from './Accuil';
+import { verifyLogin } from '@/app/services';
+verifyLogin
 
+export default function  Home(){
+  const [el, setel] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
 
-
-class Home extends React.Component{
-  constructor(props){
-        super(props);
-        this.state = {
-          token: typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null
-        };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await verifyLogin();
+        if (response) {
+          if(response.status == 200 && response.statusText=="OK"){
+            setel(response.statusText);
+            console.log(response.status);
+          }
+        } else {
+          setErrorMessage('veuillez vous connecter!');
+        }
+      } catch (error) {
+        console.error(error);
       }
-    
-  render(){
-    const token = this.state.token
-    console.log(token)
-    const el = token === null ? (
-      <>
-        <Hero />
-        <Features />
-        <FeaturesBlocks />
-        <Testimonials />
-        <Newsletter />
-      </>
-      ):(
-          <EvolutionGrossesseForm/>
-        )
+    };
 
-  return (
-    el
-  )
+    fetchData();
+  }, []);
+
+  if(el=='OK'){
+    return(
+        <EvolutionGrossesseForm/>
+    )
+  }else{
+    return(
+      <Accuiel />
+    )
+  }
+
 }
-}
-export default Home

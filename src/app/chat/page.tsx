@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import OpenAI from 'openai';
 import { Send } from "react-feather";
 import { content } from '@/components/utils/infoContent';
-// import Cookies from 'js-cookie';
-
+import { BASE_URL } from '../services';
+// import '@/app/styl.css';
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
   dangerouslyAllowBrowser: true,
@@ -53,16 +53,12 @@ export default function Chat() {
       },
     ]);
     const token = localStorage.getItem('access_token');
-    // const csrftoken = Cookies.get('csrftoken');
-    // console.log(csrftoken)
-
-
+   
     // Envoie de la conversation au backend
-  await fetch('http://localhost:8000/api/v1/chatbot/save-conversation/', {
+  await fetch(`${BASE_URL}chatbot/save-conversation/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // 'X-CSRFToken': token, 
       'Accept': 'application/json',
       'Authorization' :`Bearer ${token}`
     },
@@ -82,7 +78,7 @@ export default function Chat() {
       <div className='w-full max-w-screen-md mg-white p-4 rounded-lg shadow-md bg-stone-100'>
         <div className='mb-4'>
           <div className='text-4xl font-bold text-blue-800 mb-2'>
-            Intmia Chatbot 
+            Intimia Chatbot 
           </div>
           <p className='text-gray-600 text-lg'>
             Welcome to the intimiaChatBot. Ask me anything about intimacy, pregnancy, menstruation, or any related topics!!!
@@ -145,6 +141,9 @@ export default function Chat() {
           )}
         </div>
       </div>
+    {/* <style>
+    background-image: url("../../public/b.jpg");
+    </style> */}
     </div>
   );
 }

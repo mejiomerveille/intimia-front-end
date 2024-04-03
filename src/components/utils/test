@@ -273,3 +273,65 @@ const RegisterRdvForm: NextPage = () =>{
   );
 }
 export default RegisterRdvForm;
+
+
+"Votre_bebe":"","Votre_corps":"","conseils":"","Info":"","Infojumeaux":""
+Fatigue ,Mal de dos ,Pas de perte  ,Irritable ,Tout va bien,Crampes, Seins sensibles  ,Mal de tete  , Acne ,Fringales,Insomnie   , Somnolence        ,
+    Ecoulement mamelonnaire,
+    Mictions frequentes    ,
+    Crampes dans les jambes,
+    Saignement des gencives,
+    Aversion alimentaire   ,
+    Appetit accru          ,
+    Perte d"apetit         ,
+    Nausees                ,
+    { src: 'https://th.bing.com/th/id/OIG4.5L7LEXeN62JviM__dcds?pid=ImgGn', desc: 'Brulures d\'estomac         ' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Vomissements' },
+    { src: 'https://th.bing.com/th/id/OIG4.Ovs6G3kquUNcrzzmohW4?pid=ImgGn', desc: 'Ballonnements' },
+    { src: 'https://th.bing.com/th/id/OIG4.5L7LEXeN62JviM__dcds?pid=ImgGn', desc: 'Constipation' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Diarhee' },
+    { src: 'https://th.bing.com/th/id/OIG4.Ovs6G3kquUNcrzzmohW4?pid=ImgGn', desc: 'Digestion normale' },
+    { src: 'https://th.bing.com/th/id/OIG4.5L7LEXeN62JviM__dcds?pid=ImgGn', desc: 'Selles normales' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Gonflement des jambes' },
+    { src: 'https://th.bing.com/th/id/OIG4.5L7LEXeN62JviM__dcds?pid=ImgGn', desc: 'Gonflement du visage' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Congestion nasale' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Calme' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Heureuse' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Energique' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Enjouee' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Sautes d\'humeur' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Irritable' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Triste' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Angoissee' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Deprimee' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Culpabilite' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Pensees obsessionnelles' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Manque d\'energie' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'L\'ethargique' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Perdue' },
+    { src: 'https://th.bing.com/th/id/OIG4.J1Nd40Qkj1loJpw53f0c?pid=ImgGn', desc: 'Tres autocritique' },
+
+// class Home extends React.Component{
+//   constructor(props){
+//         super(props);
+//         this.state = {
+//           token: typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null
+//         };
+//       }
+    
+//   render(){
+//     const token = this.state.token
+//     // verifylogin(token)
+//     // console.log(token)
+//     const el = token === null ? (
+//         <Accuiel />
+//       ):(
+//           <EvolutionGrossesseForm/>
+//         )
+
+//   return (
+//     el
+//   )
+// }
+// }
+// export default Home

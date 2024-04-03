@@ -2,14 +2,13 @@
 import type { NextPage } from "next";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { registerrdv } from '../../app/services';
+import { registerrdv,getMedecins,getGrossesse } from '../../app/services';
 import Modal from 'react-modal';
 import { useRouter } from "next/navigation";
 // import { useRouter } from "next/router";
 import { css } from "@emotion/react";
 import { BeatLoader } from "react-spinners";
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Link from "next/link";
 import { CloseIcon } from "stream-chat-react";
 
@@ -20,27 +19,14 @@ const override = css`
   margin: 0 auto;
 `;
 
-// const messageRdv=(status:string,message:string,data:string)=>{
-//     messageError:[{
-//       status:"status",
-//       message:"message",
-//       data:"data",
-//     }]
-
-// }
-
-
 // Yup schema to validate the form
 const schema = Yup.object().shape({
-  name: Yup.string().required(),
-  profession: Yup.string().required(),
-  email: Yup.string().required().email(),
-  date: Yup.string().required(),
-  time: Yup.string().required(),
-  weight: Yup.string(),
+  grossesse: Yup.string().required('veuillez selectionner une grossesse!'),
+  doctor: Yup.string().required('veuillez selectionner le nom de votre medecin!'),
+  date: Yup.string().required('veuillez saisir la date du rendez-vous'),
+  time: Yup.string().required('veuillez saisir lheure du rendez-vous'),
   reminder: Yup.string(),
   notes: Yup.string(),
-
 });
 
 const RegisterRdvForm: NextPage = () =>{
@@ -51,19 +37,15 @@ const RegisterRdvForm: NextPage = () =>{
   const [selectedMedecinId, setSelectedMedecinId] = useState("");
   const [selectedMedecin, setSelectedMedecin] = useState("");
   const [medecins, setMedecins] = useState([]);
+  const [grossesse, setGrossesse] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const handleClick = () => {
-      setModalOpen(true);
-      
-    };
-  
 
-  // Formik hook to handle the form state
   const formik = useFormik({
     initialValues: {
+      grossesse: "",
+      doctor:"",
       date: "",
       time: "",
-      weight: "",
       reminder: "",
       notes: "",
     },
@@ -71,17 +53,11 @@ const RegisterRdvForm: NextPage = () =>{
     // Pass the Yup schema to validate the form
     validationSchema: schema,
 
-    onSubmit: async ({ date, time, weight,reminder,notes}) => {
+    onSubmit: async ({ grossesse,doctor,date, time, reminder,notes}) => {
+      console.log("je suis la!")
       try {
-        const response = await registerrdv({
-          medecinId: selectedMedecinId,
-          date,
-          time,
-          weight,
-          reminder,
-          notes,
-        });
         setIsLoading(true); 
+        const response = await registerrdv({ grossesse,doctor,date,time,reminder,notes});
         if (response) {
           // messageRdv("success","Enregistrement réussie !",response)
           setSuccessMessage('Enregistrement réussie !');
@@ -89,7 +65,6 @@ const RegisterRdvForm: NextPage = () =>{
         } else {
           setErrorMessage('Erreur de l\'enregistrement.');
           // messageRdv("error","Erreur de l\'enregistrement!" ,"")
-
         }
       } catch (error) {
         console.error(error);
@@ -97,80 +72,54 @@ const RegisterRdvForm: NextPage = () =>{
         setErrorMessage('Erreur lors de la communication avec le serveur.');
       }finally {
         setIsLoading(false); // Désactiver le loader
-        setSuccessMessage('');
-        setErrorMessage('');
+        // setSuccessMessage('');
+        // setErrorMessage('');
       }
     },
   });
-
-  // Destructure the formik object
   const { errors, touched, values, handleChange, handleSubmit } = formik;
   
-    
-    useEffect(() => {
-      const fetchMedecins = async () => {
-        try {
-          const response = await axios.get('http://localhost:8000/api/v1/rdv/medecins/');
-          setMedecins(response.data);
-          const currentUrl = router.asPath;
-          const url = localStorage.setItem('URL1',currentUrl) ;
-        } catch (error) {
-          console.error(error);
-        }
-      };
-  
-      fetchMedecins();
-    }, []);
+  useEffect(() => {
+    getMedecins()
+      .then(response => {
+        setMedecins(response);
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des medecins:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    getGrossesse()
+      .then(response => {
+        setGrossesse(response.data);
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des grossesses:', error);
+      });
+  }, []);
+
 
     const handleSelectMedecin = (medecin) => {
       setSelectedMedecinId(medecin.id);
       setSelectedMedecin(medecin.name);
       setModalOpen(false);
     };
-
+    
+  const handleClick = () => {
+    setModalOpen(true);
+    
+  };
+ 
     
   return (
     <div className="border-blue-400 mt-16">
     <div className="grid place-items-center h-screen">
       <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400 bg-gray-50">
         <h1 className="text-xl font-bold my-4">Enregistrer un rendez-vous medical</h1>
-        {selectedMedecin?(
-          // <label htmlFor="selectedMedecin">{selectedMedecin}</label>
-          <input
-             type="text"
-             name="selectedMedecin"
-             value={selectedMedecin}
-             onChange={handleChange}
-             id="selectedMedecin"
-             onClick={handleClick}
-             placeholder="selectedMedecin"
-             />
-                          ) : (
-                              <>
-                                  <button className="bg-green-600 text-white font-bold rounded-full cursor-pointer px-6 py-2 mb-4 " onClick={handleClick} >
-                                    {isLoading ? (
-                                      <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
-                                    ) : (
-                                      "Selectionner votre medecin"
-                                    )}
-                                    
-                                    </button>
-                              </>
-                  )
-        }
           <Modal isOpen={modalOpen}
-          style={{
-            // overlay: {
-            //   backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            // },
-            // content: {
-            //   top: '50%',
-            //   left: '50%',
-            //   right: 'auto',
-            //   bottom: 'auto',
-            //   marginRight: '-50%',
-            //   transform: 'translate(-50%, -50%)',
-            // },
+            style={{
             overlay: {
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
               zIndex: 1000,
@@ -230,6 +179,44 @@ const RegisterRdvForm: NextPage = () =>{
   
       </Modal>
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <select
+              onChange={handleChange}
+              value={values.grossesse}
+              id="grossesse"
+               className="w-full border border-gray-300 p-2 mb-4 rounded" id="grossesse" name="grossesse" >
+              <option value="grossesse">Grossesse correspondante:</option>
+              {grossesse.map((g) => (
+                <optgroup key={g.id} >
+                <option  value={g.id}>{'grossesse de '+g.user_id__username+'-du '+g.start_date+' au '+g.end_date}</option>
+                </optgroup>
+                ))}
+            </select>
+          {errors.grossesse && touched.grossesse && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.grossesse}</span>}
+
+        {selectedMedecin?(
+  <input
+     type="text"
+     name="doctor"
+     value={values.doctor}
+     onChange={handleChange}
+     id="doctor"
+     onClick={handleClick}
+     placeholder="selectionner le medecin concerne"
+     />
+        ) : (
+            <>
+                <button className="bg-green-600 text-white font-bold rounded-full cursor-pointer px-6 py-2 mb-4 " onClick={handleClick} >
+                  {isLoading ? (
+                    <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
+                  ) : (
+                    "Selectionner votre medecin"
+                  )}
+                  
+                  </button>
+            </>
+        )
+}
+
           <input
              type="date"
              name="date"
@@ -249,16 +236,7 @@ const RegisterRdvForm: NextPage = () =>{
              />
            {errors.time && touched.time && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.time}</span>}
            
-          <input
-             type="weight"
-             name="weight"
-             value={values.weight}
-             onChange={handleChange}
-             id="weight"
-             placeholder="weight"
-             />
-           {errors.weight && touched.weight && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.weight}</span>}
-          {/* <label htmlFor="note">note</label> */}
+          
           <textarea
           className="b-black"
            name="notes"
@@ -280,16 +258,25 @@ const RegisterRdvForm: NextPage = () =>{
  
           />
           </div>
-          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2">
+          {/* <button type="submit" role="button" className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2" onClick={handleSubmit}>
           {isLoading ? (
             <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
           ) : (
             "Enregistrer le rdv"
           )}
-          </button>
+          </button> */}
+          {isLoading ? (
+              <div className='bg-blue-500 text-white p-2 rounded-r-l animate-pulse'>
+                Loading...
+              </div>
+                ) : (
+              <button
+                type='submit'
+                
+                className="bg-blue-500 text-white w-full py-2 rounded">Ajouter un drv </button>
+                    )}
         </form>
-        {/* {messageError.map((message, index) => ()} */}
-        {successMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{successMessage}</p>}
+        {successMessage && <p className="bg-green-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{successMessage}</p>}
         {errorMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errorMessage}</p>}
       </div>
     </div>

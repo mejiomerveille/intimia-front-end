@@ -3,9 +3,8 @@ import Logo from '../../../public/logo.jpeg'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import MobileMenu from './mobile-menu'
-import Dropdown from '../utils/dropdown'
 import Image from 'next/image'
-
+import { verifyLogin } from '@/app/services'
 class Header extends React.Component{
   constructor(props){
     super(props);
@@ -28,8 +27,30 @@ class Header extends React.Component{
     })
     window.pageYOffset > 10 ? this.setState({top:false}) : this.setState({top:true})
   }  
+  const [verif, setel] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
+  
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await verifyLogin();
+        if (response) {
+          if(response.status == 200 && response.statusText=="OK"){
+            setel(response.statusText);
+          }
+        } else {
+          setErrorMessage('veuillez vous connecter!');
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
+    fetchData();
+  }, []);
+  
+   
   
   componentDidMount() {
     if(this.state.top){
@@ -39,6 +60,7 @@ class Header extends React.Component{
      
     }
   }
+
 render(){
 
   return (
