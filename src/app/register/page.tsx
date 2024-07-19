@@ -1,160 +1,233 @@
 "use client";
-import type { NextPage } from "next";
-import { useFormik } from "formik";
-import { css } from "@emotion/react";
-import { BeatLoader } from "react-spinners";
-import * as Yup from "yup";
-import { useState } from 'react';
-import { register } from '../../app/services';
+import Forfaits from '@/components/acceuil/forfait';
+import React, { useState } from 'react';
+import 'react-datepicker/dist/react-datepicker.css';
 import { useRouter } from "next/navigation";
-
-
-const override = css`
-  display: block;
-  margin: 0 auto;
-`;
-// Yup schema to validate the form
-const schema = Yup.object().shape({
-  username: Yup.string().required(),
-  first_name: Yup.string().required(),
-  last_name: Yup.string().required(),
-  email: Yup.string().required().email(),
-  password: Yup.string().required().min(8),
-  password2: Yup.string().required().oneOf([Yup.ref('password')], 'Les mots de passe doivent correspondre.'),
-});
-
-
-const Signup: NextPage = () => {
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+import { register } from '../../app/services';
+import Profil from '@/components/register/Profil';
+import InfoCompte from '@/components/register/InfomationsDuCompte';
+import InfoPersonelle from '@/components/register/InformationsPersonnelles';
+import Loader from "@/components/register/loader";
+import {  useEffect } from 'react';
+export default function Signup() {
+  const[loading,setLoading]=useState(true);
   const router = useRouter();
-
-
-  // Formik hook to handle the form state
-  const formik = useFormik({
-    initialValues: {
-      username: "",
-      first_name: "",
-      last_name: "",
-      email: "",
-      password: "",
-      password2: "",
-    },
-
-    // Pass the Yup schema to validate the form
-    validationSchema: schema,
-
-    // Handle form submission
-    onSubmit: async ({ username,first_name,last_name, email, password, password2}) => {
-      try {
-        setIsLoading(true); 
-        const response = await register({ username, first_name,last_name, email, password ,password2});
-        if (response) {
-          setSuccessMessage('Inscription réussie !');
-          router.replace("login");
-        } else {
-          setErrorMessage('Erreur lors de l\'inscription.');
-        }
-      } catch (error) {
-        console.error(error);
-        setErrorMessage('Erreur lors de la communication avec le serveur.');
-      } finally {
-        setIsLoading(false); // Désactiver le loader
-      }
-    },
+  const [etape, setEtape] = useState(1);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [donnees, setDonnees] = useState({
+    profil: '',
+    first_name: '',
+    last_name: '',
+    sexe: '',
+    genre: '',
+    pays: '',
+    last_graduation: '',
+    lieu_naissance: '',
+    religion: '',
+    roles_religieux: '',
+    denomination: '',
+    telephone: '',
+    email: '',
+    prefession: '',
+    password: '',
+    password2: '',
   });
+  const [erreurs, setErreurs] = useState({});
+  // const router = useRouter();
 
-  // Destructure the formik object
-  const { errors, touched, values, handleChange, handleSubmit } = formik;
+  const handleChange = (event: { target: { name: any; value: any; }; }) => {
+    const { name, value } = event.target;
+    setDonnees((prevState) => ({ ...prevState, [name]: value }));
+    setErreurs((prevErreurs) => ({
+      ...prevErreurs,
+      [name]: '',
+    }));
+  };
+ 
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+ 
+    const handleDateChange = (date: React.SetStateAction<Date | null>) => {
+        setDateOfBirth(date);
+      };
+      
+  const minDate = new Date();
+  minDate.setFullYear(minDate.getFullYear() - 12);
+  
+  const handleValidation = () => {
+    const erreurs = {};
+    if(etape===2){
+      if(!dateOfBirth){
+        erreurs.dateOfBirth='La date de naissance est obligatoire!'
+      }
+      if (donnees.first_name==='') {
+        erreurs.first_name = 'Le nom est obligatoire';
+      }
+    }else if(etape===3){
+
+      if (donnees.email==='') {
+        erreurs.email = 'L\'adresse e-mail est obligatoire';
+      }
+      if (!donnees.password) {
+        erreurs.password = 'Le mot de passe est obligatoire';
+      }
+      if (!donnees.password2) {
+        erreurs.password2 = 'La confirmation du mot de passe est obligatoire';
+      }
+      if (donnees.password!=donnees.password2) {
+        erreurs.password2 = 'Les mots de passe doivent etre identique';
+      }
+    }
+
+    if (Object.keys(erreurs).length > 0) {
+      setErreurs(erreurs);
+      return false;
+    }
+    return true;
+  };
+  const handleSubmit = async()=>{
+    const data={
+      email:donnees.email,
+      password:donnees.password,
+      password2:donnees.password2,
+      first_name:donnees.first_name,
+      last_name:donnees.last_name,
+      profil:donnees.profil,
+      date_naissance:dateOfBirth,
+      sexe:donnees.sexe,
+      lieu_naissance:donnees.lieu_naissance,
+      genre:donnees.genre,
+      pays:donnees.pays,
+      last_graduation:donnees.last_graduation,
+      religion:donnees.religion,
+      roles_religieux:donnees.roles_religieux,
+      denomination:donnees.denomination,
+      telephone:donnees.telephone,
+      prefession:donnees.prefession,
+    }
+    try {
+      // setIsLoading(true); 
+      const response = await register({data});
+      console.log(data)
+          if (response) {
+            console.log(response)
+            setSuccessMessage('Inscription réussie !');
+            router.replace("login");
+          } else {
+            setErrorMessage('Erreur lors de l\'inscription.');
+          }
+        } catch (error) {
+          console.error(error);
+          setErrorMessage('Erreur lors de la communication avec le serveur.');
+        } finally {
+          // setIsLoading(false); 
+        }
+      };
+
+      const handleNext = () => {
+        if (etape === 4) {
+          console.log('Données d\'inscription:', donnees);
+          return;
+        }
+    
+        if (!handleValidation()) {
+          return;
+        }
+    
+        setEtape((prevEtape) => prevEtape + 1);
+      };
+    
+      const handlePrevious = () => {
+        if (etape === 1) {
+          return;
+        }
+        setEtape((prevEtape) => prevEtape - 1);
+      };
+    
+
+  const handleProfil = (profils) => {
+    donnees.profil=profils;
+    setEtape((prevEtape) => prevEtape + 1);
+    }
+
+
+        
+useEffect(()=>{
+  setTimeout(()=>setLoading(false),1000)
+},[]);
+
+if(loading){
+  return <Loader/>
+}
 
   return (
-    <div className="grid place-items-center h-screen">
-      <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400 bg-gray-50">
-        <h1 className="text-xl font-bold my-4">Inscription</h1>
+    <div className="we container mx-auto p-10 rounded-md shadow-md bg-gray-800 text-white mt-24">
+      <h2 className="text-2xl font-bold text-center mb-8">formulaire d'inscription</h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3" method="POST">
-          <input
-            type="text"
-            name="username"
-            value={values.username}
-            onChange={handleChange}
-            id="username"
-            placeholder="Pseudo"
+      <div className="steps flex justify-between mb-6">
+        <div
+          className={`step p-4 rounded-md ${
+            etape === 1 ? 'bg-green-500' : 'bg-gray-600'
+          }`}>
+          <span className="ml-2">Profil</span>
+        </div>
+        <div
+          className={`step p-4 rounded-md ${
+            etape === 2 ? 'bg-green-500' : 'bg-gray-600'
+          }`}>
+          <span className="ml-2">informations personnelles</span>
+        </div>
+        <div
+          className={`step p-4 rounded-md ${
+            etape === 3 ? 'bg-green-500' : 'bg-gray-600'
+          }`}>
+          <span className="ml-2">Infomations du compte</span>
+        </div>
+        <div
+          className={`step p-4 rounded-md ${
+            etape === 4 ? 'bg-green-500' : 'bg-gray-600'
+          }`}>
+          <span className="ml-2">les forfaits </span>
+        </div>
+      </div>
 
-          />
-          {errors.username && touched.username && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.username}</span>}
+      <div className="step-content">
 
-          <input
-            type="text"
-            name="first_name"
-            value={values.first_name}
-            onChange={handleChange}
-            id="first_name"
-            placeholder="Nom"
+          {etape === 1 && (<Profil handleSubmit={handleSubmit} handleProfil={handleProfil}/>)}
+          {etape === 2 && (<InfoPersonelle handleSubmit={handleSubmit} donnees={donnees} handleChange={handleChange} erreur={erreurs} handleNextStep={handleNext} handlePrevStep={handlePrevious} handleDateChange={handleDateChange} minDate={minDate} />)}
 
-          />
-          {errors.first_name && touched.first_name && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.first_name}</span>}
-          <input
-            type="text"
-            name="last_name"
-            value={values.last_name}
-            onChange={handleChange}
-            id="last_name"
-            placeholder="Prenom"
+          {etape === 3 && (<InfoCompte handleSubmit={handleSubmit} donnees={donnees} handleChange={handleChange} erreur={erreurs} handleNextStep={handleNext} handlePrevStep={handlePrevious}/> )}
 
-          />
-          {errors.last_name && touched.last_name && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.last_name}</span>}
-
-          {/* <label htmlFor="email">Email</label> */}
-          <input
-            type="email"
-            name="email"
-            value={values.email}
-            onChange={handleChange}
-            id="email"
-            placeholder="Email"
-
-          />
-          {errors.email && touched.email && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.email}</span>}
-
-          <input
-            type="password"
-            name="password"
-            value={values.password}
-            onChange={handleChange}
-            id="password"
-            placeholder="Mot de passe"
-
+        {etape === 4 && (
+          <div>
+            <form onSubmit={handleSubmit} action="" method="post">
+            <Forfaits/>
+            </form>
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-gray-500"
+            >
+              Previous
+            </button>
+            {/* <form onSubmit={handleSubmit} action="" method="post">
+            <button
+              type="submit"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-green-500"
+            >
+              Submit
+            </button>
+            </form> */}
+            {errorMessage && <p className="text-red-500 text-sm mt-1">{errorMessage}</p>}
+            {successMessage && <p className="text-green-500 text-sm mt-1">{successMessage}</p>}
             
-          />
-          {errors.password && touched.password && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.password}</span>}
+          </div>
+        )}
+      </div>
 
-
-          <input
-            type="password2"
-            name="password2"
-            value={values.password2}
-            onChange={handleChange}
-            id="password2"
-            placeholder="Reecrire le mot de passe"
-
-          />
-          {errors.password2 && touched.password2 && <span className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errors.password2}</span>}
-
-          <button className="bg-green-600 text-white font-bold cursor-pointer px-6 py-2" disabled={isLoading} type="submit"> 
-          {isLoading ? (
-            <BeatLoader color={"#ffffff"} loading={isLoading} css={override} size={10} />
-          ) : (
-            "Submit"
-          )}
-          </button>
-        </form>
-        {successMessage && <p className="bg-green-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{successMessage}</p>}
-        {errorMessage && <p className="bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">{errorMessage}</p>}
+      <div className="step-counter text-right mt-4">
+        {etape}/{4}
       </div>
     </div>
   );
-};
-
-export default Signup;
+}

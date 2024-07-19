@@ -6,48 +6,54 @@ import Modal from 'react-modal';
 import { CloseIcon } from "stream-chat-react";
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
-
+import Loader from "@/components/register/loader";
 
 const Welcome = () => {
   const router = useRouter();
+  const[loading,setLoading]=useState(true);
   const [grossesse, setGrossesse] = useState([]);
-  const [week, setWeek] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
   const [selectedGrossesseId, setSelectedGrossesseId] = useState("");
   const [selectedGrossesse, setSelectedGrossesse] = useState("");
 
-  const handleClick = () => {
-      setModalOpen(true);
+  useEffect(() => {
+      getGrossesse()
+        .then(response => {
+          setGrossesse(response.data);
+          // console.log(response.data);
+        })
+        .catch(error => {
+          console.error('Erreur lors de la récupération des grossesses:', error);
+        });
+  }, []);
+
+  const handleSelectGrossesse = (grossesse) => {
+    localStorage.setItem('selectedGrossesseId', grossesse.id)
+    console.log(grossesse.id)
+    setSelectedGrossesseId(grossesse.id); 
+    setSelectedGrossesse(grossesse.user_id__username+'-'+grossesse.start_date);
+    router.replace("/");
+  };
+
+  const modifier = async (id:number) => {
+    const confirmed = window.confirm('Voulez-vous vraiment modifier ce rendez-vous?');
+    if (confirmed) {
+    router.replace("/grossesse");
+    }
+  };
+
       
-    };
-  
+useEffect(()=>{
+  setTimeout(()=>setLoading(false),1000)
+},[]);
 
-    useEffect(() => {
-        getGrossesse()
-          .then(response => {
-            setGrossesse(response.data);
-            console.log(response.data);
-          })
-          .catch(error => {
-            console.error('Erreur lors de la récupération des grossesses:', error);
-          });
-      }, []);
-
-      const handleSelectGrossesse = (grossesse) => {
-        localStorage.setItem('selectedGrossesseId', grossesse.id)
-        console.log(grossesse.id)
-        setSelectedGrossesseId(grossesse.id); 
-        setSelectedGrossesse(grossesse.user_id__username+'-'+grossesse.start_date);
-        setModalOpen(false);
-        // window.location.reload();
-        router.replace("/");
-        };
+if(loading){
+  return <Loader/>
+}
 
   return (
     <div className='mt-24'>
         <Modal isOpen={true}
           style={{
-            
             overlay: {
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
               zIndex: 1000,
@@ -67,9 +73,9 @@ const Welcome = () => {
         <div>
           <div className="flex justify-between">
             <h1 className="text-2xl font-bold mb-4">Liste des grossesses</h1>
-            <button onClick={() => setModalOpen(false)}>
+            {/* <button onClick={() => setModalOpen(false)}> */}
             <CloseIcon />
-            </button>
+            {/* </button> */}
           </div>
       <table className="border-collapse w-full">
         <thead>
@@ -79,6 +85,7 @@ const Welcome = () => {
             <th className="py-2 px-4 border-b">Enregistrer par:</th>
             <th className="py-2 px-4 border-b">Proprietaire</th>
             <th className="py-2 px-4 border-b">Actions</th> 
+            <th className="py-2 px-4 border-b">Others</th> 
           </tr>
           
         </thead>
@@ -95,6 +102,14 @@ const Welcome = () => {
                   onClick={() => handleSelectGrossesse(g)}
                 >
                   Sélectionner
+                </button>
+              </td>
+              <td className="py-2 px-4 border-b">
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={() => modifier(g.id)} 
+                >
+                  Modifier
                 </button>
               </td>
             </tr>

@@ -1,0 +1,526 @@
+"use client";
+import Forfaits from '@/components/acceuil/forfait';
+import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { register } from '../../app/services';
+
+export default function Signup() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [profil, setProfil] = useState('');
+  const [first_name, setfirst_name] = useState('');
+  const [last_name, setlast_name] = useState('');
+  const [sexe, setSexe] = useState('');
+  const [genre, setgenre] = useState('');
+  const [pays, setpays] = useState('');
+  const [last_graduation, setlast_graduation] = useState('');
+  const [religion, setreligion] = useState('');
+  const [role_religieux, setrole_religieux] = useState('');
+  const [denomination, setdenomination] = useState('');
+  const [username, setusername] = useState('');
+  const [telephone, settelephone] = useState('');
+  const [email, setemail] = useState('');
+  const [profession, setprofession] = useState('');
+  const [password, setpassword] = useState('');
+  const [password2, setpassword2] = useState('');
+  const [erreur, setErreur] = useState({});
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+ 
+    const handleDateChange = (date) => {
+        setDateOfBirth(date);
+      };
+      
+  const minDate = new Date();
+  minDate.setFullYear(minDate.getFullYear() - 12);
+  
+  const handleSubmit = async()=>{
+    const data={
+      username:username,
+      email:email,
+      password:password,
+      password2:password2,
+      first_name:first_name,
+      last_name:last_name,
+      profil:profil,
+      date_naissance:dateOfBirth,
+      sexe:sexe,
+      genre:genre,
+      pays:pays,
+      last_graduation:last_graduation,
+      religion:religion,
+      role_religieux:role_religieux,
+      denomination:denomination,
+      telephone:telephone,
+      profession:profession,
+    }
+    console.log(data)
+        try {
+          // setIsLoading(true); 
+          const response = await register({data});
+          if (response) {
+            console.log(response)
+            setSuccessMessage('Inscription réussie !');
+            // router.replace("login");
+          } else {
+            setErrorMessage('Erreur lors de l\'inscription.');
+          }
+        } catch (error) {
+          console.error(error);
+          setErrorMessage('Erreur lors de la communication avec le serveur.');
+        } finally {
+          // setIsLoading(false); 
+        }
+      };
+  
+
+  const handlevalidation = () =>{
+    let erroretape ={};
+    if(currentStep===2){
+      console.log(first_name);
+      if(!first_name){
+        erroretape.first_name ='veuillez entrer votre nom';
+      }
+      if(!dateOfBirth){
+        erroretape.dateOfBirth='veuillez entrer votre date de naissance';
+      }
+      // if(!sexe){
+      //   erroretape.sexe='veuillez entrer votre sexe';
+      // }
+      if(!sexe){
+        erroretape.genre='veuillez entrer votre genre';
+      }
+      // if(!sexe){
+      //   erroretape.pays='veuillez entrer votre pays';
+      // }
+      // if(!sexe){
+      //   erroretape.last_graduation='veuillez entrer votre dernier diplome';
+      // }
+      if(!religion){
+        erroretape.religion='veuillez entrer votre sexe';
+      }
+      if(!role_religieux){
+        erroretape.role_religieux='veuillez entrer votre role religieux';
+      }
+      if(!denomination){
+        erroretape.denomination='veuillez entrer votre denomination';
+      }
+      if (dateOfBirth && dateOfBirth > minDate) {
+        erroretape.dateOfBirth2='Vous devez au moins avoir 12 ans pour vous inscrire!';
+      }
+    }
+    else if(currentStep===3){
+      if(!email || !email.includes('@')){
+        erroretape.email='Adresse e-mail invalide'
+      }
+      if(!username ){
+        erroretape.username='veuillez saisir votre pseudo'
+      }
+      if(!telephone ){
+        erroretape.telephone='veuillez saisir votre numero de telephone'
+      }
+      if(!profession){
+        erroretape.profession='veuillez saisir votre profession'
+      }
+      if(!password ){
+        erroretape.password='veuillez saisir votre mot de passe'
+      }
+      if(password.length<8){
+        erroretape.pwd='le mot de passe doit contenir au moins 8 caracteres'
+      }
+      if(password!=password2){
+        erroretape.password2='les mots de passe doivent etre identiques!'
+      }
+    }else{
+      erroretape=undefined;
+    }
+    return erroretape;
+    };
+
+  const handleNextStep = () => {
+    const errorStep=handlevalidation();
+    
+    switch (currentStep){
+      case 1:
+        if(errorStep.length !=undefined){
+          setErreur({...erreur, ...errorStep});
+          return;
+        }
+        break;
+      case 2:
+        if(errorStep.length !=undefined){
+          setErreur({...erreur, ...errorStep});
+          return;
+        }
+        break;
+      case 3:
+        if(errorStep.length !=undefined){
+          setErreur({...erreur, ...errorStep});
+          return;
+        }
+        break;
+    }
+    setCurrentStep(currentStep + 1);
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep(currentStep - 1);
+  };
+
+  const handleProfil = (profils) => {
+    setProfil(profils);
+    setCurrentStep(currentStep + 1);
+    }
+  return (
+    <div className="we container mx-auto p-10 rounded-md shadow-md bg-gray-800 text-white mt-24">
+      <h2 className="text-2xl font-bold text-center mb-8">formulaire d'inscription</h2>
+
+      <div className="steps flex justify-between mb-6">
+        <div
+          className={`step p-4 rounded-md ${
+            currentStep === 1 ? 'bg-green-500' : 'bg-gray-600'
+          }`}
+        >
+          {/* <span className="step-number text-xl font-bold">1</span> */}
+          <span className="ml-2">Profil</span>
+        </div>
+        <div
+          className={`step p-4 rounded-md ${
+            currentStep === 2 ? 'bg-green-500' : 'bg-gray-600'
+          }`}
+        >
+          {/* <span className="step-number text-xl font-bold">2</span> */}
+          <span className="ml-2">informations personnelles</span>
+        </div>
+        <div
+          className={`step p-4 rounded-md ${
+            currentStep === 3 ? 'bg-green-500' : 'bg-gray-600'
+          }`}
+        >
+          {/* <span className="step-number text-xl font-bold">3</span> */}
+          <span className="ml-2">Infomations du compte</span>
+        </div>
+        <div
+          className={`step p-4 rounded-md ${
+            currentStep === 4 ? 'bg-green-500' : 'bg-gray-600'
+          }`}
+        >
+          {/* <span className="step-number text-xl font-bold">4</span> */}
+          <span className="ml-2">les forfaits </span>
+        </div>
+      </div>
+
+      <div className="step-content">
+          <form onSubmit={handleSubmit} method="POST" >
+            <div className="grid grid-cols-2 gap-4">
+
+          {currentStep === 1 && (
+          <>
+              <div className="form-group">
+              <h1 className="text-xl font-bold text-black mb-10">Veuillez choisir votre profil:</h1>
+              </div>
+              <div className="col-span-2 flex justify-between ">
+            <button
+              type="button"
+              onClick={()=>handleProfil('Utilisateur')}
+              className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-gray-500"
+              >
+              Utilisateur
+            </button>
+            <button
+              type="button"
+              onClick={()=>handleProfil('Personnel de sante')}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-green-500"
+              >
+              Personnel de sante
+            </button>
+          </div>   
+          </>
+          )}
+        {currentStep === 2 && (
+          <>
+            <div className="form-group">
+              <label htmlFor="first-name" className="block mb-2">
+              Nom :
+              </label>
+              <input value={first_name} onChange={(e)=>setfirst_name(e.target.value)}
+                type="text"
+                id="nom"
+                name="nom"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.first_name && <p className="text-red-500 text-sm mt-1">{erreur.first_name}</p>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="last-name" className="block mb-2">
+              Prenom :
+              </label>
+              <input value={last_name} onChange={(e)=>setlast_name(e.target.value)}
+                type="text"
+                id="prenom"
+                name="prenom"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+            </div>
+            <div>
+            <label htmlFor="dateOfBirth" className="block text-white text-sm font-bold mb-2">
+              Date of Birth:
+            </label>
+            <div> 
+              <DatePicker
+                id="date_naissance"
+                selected={dateOfBirth}
+                onChange={handleDateChange}
+                dateFormat="dd/MM/yyyy"
+                maxDate={minDate}
+                name='date_naissance'
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              />
+              {erreur.dateOfBirth && <p className="text-red-500 text-sm mt-1">{erreur.dateOfBirth}</p>}
+              {erreur.dateOfBirth2 && <p className="text-red-500 text-sm mt-1">{erreur.dateOfBirth2}</p>}
+            </div>
+          </div>
+            <div className="form-group">
+              <label htmlFor="date-of-birth" className="block mb-2">
+               Sexe:
+              </label>
+                <select value={sexe} onChange={(e)=>setSexe(e.target.value)}
+                  id="sexe"
+                  name="sexe"
+                  className="w-full px-3 py-2 rounded-md border border-gray-600 bg-gray-800 focus:outline-none focus:ring focus:ring-green-500"
+                >
+                  <option value="Homme">Homme</option>
+                  <option value="Femme">Femme</option>
+                </select>
+                {erreur.sexe && <p className="text-red-500 text-sm mt-1">{erreur.sexe}</p>}
+              
+            </div>
+            <div className="form-group">
+              <label htmlFor="genre" className="block mb-2">
+              Genre :
+              </label>
+              <input value={genre} onChange={(e)=>setgenre(e.target.value)}
+                type="text"
+                id="genre"
+                name="genre"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.sexe && <p className="text-red-500 text-sm mt-1">{erreur.sexe}</p>}
+            </div>
+            <div className="form-group">
+              <label  htmlFor="pays" className="block mb-2">
+               Pays:
+              </label>
+              <div className="flex space-x-2">
+                <select  value={pays} onChange={(e)=>setpays(e.target.value)}
+                  id="pays"
+                  name="pays"
+                  className="w-full px-3 py-2 rounded-md border border-gray-600 bg-zinc-700 focus:outline-none focus:ring focus:ring-green-500"
+                >
+                  <optgroup label="Afrique">
+                  <option value="Cameroun">Cameroun</option>
+                  <option value="afrique-du-sud">Afrique du Sud</option>
+                  <option value="algerie">Algérie</option>
+                  </optgroup>
+                  <optgroup label="Amérique">
+                  <option value="antigua-et-barbuda">Antigua-et-Barbuda</option>
+                  <option value="argentine">Argentine</option>
+                  </optgroup>
+                </select>
+                {erreur.pays && <p className="text-red-500 text-sm mt-1">{erreur.pays}</p>}
+              </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="date-of-birth" className="block mb-2">
+               Dernier Diplome:
+              </label>
+                <select value={last_graduation} onChange={(e)=>setlast_graduation(e.target.value)}
+                  id="last_graduation"
+                  name="last_graduation"
+                  className="w-full px-3 py-2 rounded-md border border-gray-600 bg-gray-800 focus:outline-none focus:ring focus:ring-green-500"
+                >
+                  <option value="BAC+1">BAC1</option>
+                  <option value="BAC+2">BAC+2</option>
+                  <option value="Licence">Licence</option>
+                  <option value="Master">Master</option>
+                </select>
+                {erreur.last_graduation && <p className="text-red-500 text-sm mt-1">{erreur.last_graduation}</p>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="last-name" className="block mb-2">
+              Religion :
+              </label>
+              <input value={religion} onChange={(e)=>setreligion(e.target.value)}
+                type="text"
+                id="religion"
+                name="religion"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.religion && <p className="text-red-500 text-sm mt-1">{erreur.religion}</p>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="last-name" className="block mb-2">
+              Role religieux :
+              </label>
+              <input value={role_religieux} onChange={(e)=>setrole_religieux(e.target.value)}
+                type="text"
+                id="role_religieux"
+                name="role_religieux"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.reole_religieux && <p className="text-red-500 text-sm mt-1">{erreur.role_religieux}</p>}
+            </div>
+            <div className="form-group">
+              <label htmlFor="last-name" className="block mb-2">
+              denomination :
+              </label>
+              <input value={denomination} onChange={(e)=>setdenomination(e.target.value)}
+                type="text"
+                id="denomination"
+                name="denomination"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.denomination && <p className="text-red-500 text-sm mt-1">{erreur.denomination}</p>}
+            </div>
+          <div className="col-span-2 flex justify-between ">
+            <button
+              type="button"
+              onClick={handlePrevStep}
+              className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-gray-500"
+              >
+              Previous
+            </button>
+            <button
+              type="button"
+              onClick={handleNextStep}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-green-500"
+              >
+              Next
+            </button>
+          </div>
+            </>
+          )}
+
+        {currentStep === 3 && (
+          <>
+          <div className="form-group">
+              <label htmlFor="phone-number" className="block mb-2">
+                Pseudo:
+              </label>
+              <input  value={username} onChange={(e)=>setusername(e.target.value)}
+                type="text"
+                id="username"
+                name="usename"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.username && <p className="text-red-500 text-sm mt-1">{erreur.username}</p>}
+          </div>
+          <div className="form-group">
+              <label htmlFor="phone-number" className="block mb-2">
+                Phone Number:
+              </label>
+              <input  value={telephone} onChange={(e)=>settelephone(e.target.value)}
+                type="tel"
+                id="telephone"
+                name="telephone"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.telephone && <p className="text-red-500 text-sm mt-1">{erreur.telephone}</p>}
+          </div>
+          <div className="form-group">
+              <label htmlFor="phone-number" className="block mb-2">
+              E-Mail:
+              </label>
+              <input  value={email} onChange={(e)=>setemail(e.target.value)}
+                type="email"
+                id="email"
+                name="email"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.email && <p className="text-red-500 text-sm mt-1">{erreur.email}</p>}
+          </div>
+          <div className="form-group">
+              <label htmlFor="phone-number" className="block mb-2">
+                Profession:
+              </label>
+              <input  value={profession} onChange={(e)=>setprofession(e.target.value)}
+                type="text"
+                id="Profession"
+                name="Profession"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.profession && <p className="text-red-500 text-sm mt-1">{erreur.profession}</p>}
+          </div>
+          <div className="form-group">
+              <label htmlFor="phone-number" className="block mb-2">
+                Mot de passe :
+              </label>
+              <input  value={password} onChange={(e)=>setpassword(e.target.value)}
+                type="password"
+                id="ppassword"
+                name="password"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+              {erreur.password && <p className="text-red-500 text-sm mt-1">{erreur.password}</p>}
+              {erreur.pwd && <p className="text-red-500 text-sm mt-1">{erreur.pwd}</p>}
+          </div>
+            <div className="form-group">
+              <label htmlFor="email" className="block mb-2">
+                Reécrire le mot de passe:
+              </label>
+              <input value={password2} onChange={(e)=>setpassword2(e.target.value)}
+                type="password"
+                id="password2"
+                name="password2"
+                className="w-full px-3 py-2 rounded-md border border-gray-400 focus:outline-none focus:ring focus:ring-green-500"
+              />
+            </div>
+            {erreur.password2 && <p className="text-red-500 text-sm mt-1">{erreur.password2}</p>}
+          <div className='col-span-2 flex justify-between'>
+            <button
+              type="button"
+              onClick={handlePrevStep}
+              className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-gray-500"
+              >
+              Previous
+            </button>
+            <button
+              type="button"
+              onClick={handleNextStep}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-green-500"
+              >
+              Next
+            </button>
+          </div>
+              </>
+        )}
+        </div>
+
+        {currentStep === 4 && (
+          <div>
+            <Forfaits/>
+            <button
+              type="button"
+              onClick={handlePrevStep}
+              className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-gray-500"
+            >
+              Previous
+            </button>
+            <button
+              type="submit"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-green-500"
+            >
+              Submit
+            </button>
+          </div>
+        )}
+      </form>
+      </div>
+
+      <div className="step-counter text-right mt-4">
+        {currentStep}/{4}
+      </div>
+    </div>
+  );
+}

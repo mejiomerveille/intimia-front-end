@@ -3,9 +3,10 @@ import { CloseIcon } from "stream-chat-react";
 import Link from "next/link";
 import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
-import { getrdv,deleterdv,updaterdv } from '@/app/services';
+import { getrdv,deleterdv,put_off_rdv } from '@/app/services';
 import { css } from "@emotion/react";
 import { BeatLoader } from "react-spinners";
+import { useRouter } from "next/navigation";
 
 const override = css`
   display: block;+
@@ -13,11 +14,14 @@ const override = css`
 `;
 
 const RDVList = () => {
+  const [ide1, setId1] = useState(0);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [appointments, setAppointments] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const router = useRouter();
+  const [editableId, setEditableId] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,12 +29,12 @@ const RDVList = () => {
         const response = await getrdv();
         if (response) {
           if(response.statut == 'error'){
-            console.log(response.statut);
+            // console.log(response.statut);
             setErrorMessage("Vous n'avez pas encore enregistré de rendez vous");
           }else if(response.message!=""){
             setIsLoading(true);
             setAppointments(response.data);
-            console.log(response.data);
+            // console.log(response.data);
             setSuccessMessage('reccuperation réussie !');
           }
           else{
@@ -52,19 +56,8 @@ const RDVList = () => {
   }, []);
 
   const modifier = async (id:number) => {
-    const confirmed = window.confirm('Voulez-vous vraiment modifier ce rendez-vous?');
-    if (confirmed) {
-      try {
-        const response = await updaterdv(id);
-        if (response.ok) {
-          setSuccessMessage("La modification du rendez-vous s'est effectuée avec succès");
-        } else {
-          setErrorMessage("La modification du rendez-vous a échoué");
-        }
-      } catch (error) {
-        setErrorMessage(" Une erreur s'est produite lors de la modification du rendez-vous");
-      }
-    }
+    router.replace("/rdv/update");
+    localStorage.setItem("identifiant",String(id));
   };
 
   const handleClick = async (id:number) => {
@@ -73,7 +66,7 @@ const RDVList = () => {
       try {
         const response = await deleterdv(id);
         if (response) {
-          console.log(response.data)
+          // console.log(response.data)
           setSuccessMessage("La suppression du rendez-vous s'est effectuée avec succès");
           window.location.reload();
         } else {
@@ -84,9 +77,7 @@ const RDVList = () => {
         setErrorMessage(" Une erreur s'est produite lors de la suppression du rendez-vous");
         window.location.reload();
       }
-    //  finally {
-    //   setSuccessMessage('');
-    // }
+   
     }
   };
   const handleClickM = () => {
@@ -101,6 +92,30 @@ const RDVList = () => {
       </div>
     );
   }
+const handler = async (e) => {
+  e.preventDefault();
+    const updateRdv ={
+      ...appointments,
+      date:event.target.date.value,
+      time:event.target.time.value,
+  };
+  try{
+    const response = await put_off_rdv(ide1,updateRdv);
+    console.log(ide1)
+    alert('rdv repousser avec success!');
+    window.location.reload();
+  }catch(error){
+    console.log(error)
+    alert('echec de la modification du rdv!');
+  }
+}
+const modifier2 = (id: number) => {
+    console.log(id)
+    setEditableId(id);
+    setId1(id);
+    console.log(ide1)
+
+  };
 
   return (
     <div>
@@ -115,6 +130,30 @@ const RDVList = () => {
               {appointments.map(appointment   => (
     <div className="p-4 max-w-sm"  key={appointment.id}>
         <div className="flex rounded-lg h-full dark:bg-gray-800 bg-white p-8 flex-col">
+        {editableId === appointment.id ? (
+            <>
+            <form action="" onSubmit={handler} className="flex flex-col gap-3">
+            
+            <h1>Rendez vous avec le {appointment.doctor__profession},{appointment.doctor__name}</h1>
+              <input
+                type="date"
+                id='date'
+                defaultValue={appointment.date}
+                name="date"
+                className="mb-2 text-xl font-medium text-neutral-800 dark:text-neutral-50"
+                />
+              <input
+                type="time"
+                defaultValue={appointment.time}
+                name='time'
+                id='time'
+                className="mb-4 text-base text-neutral-600 dark:text-neutral-200"
+                />
+                <button className="bg-red-600 text-white font-bold cursor-pointer px-6 py-2" type="submit">Valider</button>
+                </form>
+            </>
+          ) : (
+          <>
             <div className="flex items-center mb-3">
               
                 <div
@@ -132,18 +171,25 @@ const RDVList = () => {
                 <p className="leading-relaxed text-base text-black dark:text-gray-300">
                  avec le {appointment.doctor__name} a {appointment.time},{appointment.doctor__profession}
                 </p>
-                <div className="flex justify-between">
+                <div className="flex justify-between mt-4">
                   <button onClick={() => modifier(appointment.id)} className="transition duration-500 ease-in-out hover:bg-indigo-900 inline-block bg-green-600 text-lg font-medium rounded-full text-white px-4 py-2 cursor-pointer">
                   Modifier
                 </button>
-                <button onClick={() => handleClick(appointment.id)} className="transition duration-500 ease-in-out hover:bg-indigo-900 inline-block bg-red-600 text-lg font-medium rounded-full text-white px-4 py-2 cursor-pointer">
-                  Supprimer
+                <button onClick={() => modifier2(appointment.id)} className="transition duration-500 ease-in-out hover:bg-indigo-900 inline-block bg-red-600 text-lg font-medium rounded-full text-white px-4 py-2 cursor-pointer">
+                repousser
                 </button>
               </div>
-                <button onClick={handleClickM} className=" mt-5 transition duration-500 ease-in-out hover:bg-indigo-900 inline-block bg-blue-600 text-lg font-medium rounded-full text-white px-4 py-2 cursor-pointer">
+              {/* <div className="flex justify-between mt-10"> */}
+              {/* <button onClick={() => handleClick(appointment.id)} className="transition duration-500 ease-in-out hover:bg-indigo-900 inline-block bg-red-600 text-lg font-medium rounded-full text-white px-4 py-2 cursor-pointer">
+                   Supprimer
+                </button> */}
+                <button onClick={handleClickM} className=" mt-10 transition duration-500 ease-in-out hover:bg-indigo-900 inline-block bg-blue-600 text-lg font-medium rounded-full text-white px-4 py-2 cursor-pointer">
                   Joindre un fichier
               </button>
+              {/* </div> */}
             </div>
+          </>
+            )}
         </div>
         </div>
             ))} 
@@ -158,17 +204,8 @@ const RDVList = () => {
           backgroundColor: 'rgba(0, 0, 0, 0.6)',
           zIndex: 1000,
         },
-      content: {
-        top: '50%',
-        left: '50%',
-        right: 'auto',
-        bottom: 'auto',
-        marginRight: '-50%',
-        transform: 'translate(-50%, -50%)',
-        width: '400px',
-        maxHeight: '400px',
-        overflowY: 'auto',
-        },
+      content: {top: '50%',left: '50%', right: 'auto',bottom: 'auto', marginRight: '-50%', transform: 'translate(-50%, -50%)',
+        width: '400px', maxHeight: '400px', overflowY: 'auto', },
       }}>
           <div className="popup-content">
             <form method="POST" id="formFile">

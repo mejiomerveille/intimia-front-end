@@ -5,12 +5,36 @@ import MobileMenu from './mobile-menu';
 import Image from 'next/image';
 import { verifyLogin } from '@/app/services';
 import Logo from '../../../public/logo.jpeg';
+import { logout } from '@/app/services';
+import { useRouter } from "next/navigation";
+
 
 const Header = () => {
   const [top, setTop] = useState(true);
   const [token, setToken] = useState(typeof localStorage !== 'undefined' ? localStorage.getItem('access_token') : null);
   const [verif, setVerif] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter();
+
+  const SignOut = async () => {
+    const refreesh=localStorage.getItem('refresh_token')
+    const data={
+      refresh_token:refreesh,
+    }
+    try {
+      const response = await logout(data);
+      if (response) {
+        if (response.detail=="Logged out successfully.") {
+          setVerif(response.statusText);
+          localStorage.removeItem('access_token');
+          router.replace("/");
+        }
+      } else {
+        console.log('Veuillez vous connecter!');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,7 +45,7 @@ const Header = () => {
             setVerif(response.statusText);
           }
         } else {
-          setErrorMessage('Veuillez vous connecter!');
+          console.log('Veuillez vous connecter!');
         }
       } catch (error) {
         console.error(error);
@@ -49,9 +73,11 @@ const Header = () => {
     <header className={`fixed w-full z-30 md:bg-opacity-90 transition duration-300 ease-in-out ${!top ? 'bg-white backdrop-blur-sm shadow-lg' : ''}`}>
       <div className="max-w-6xl mx-auto px-5 sm:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <div className="shrink-0 mr-4">
+        <a className="text-pink-600 no-underline hover:no-underline font-bold text-2xl lg:text-4xl" href="/">
+            <div className="shrink-0 mr-4">
             <Image src={Logo} alt="Logo" width="60" height="60" />
           </div>
+            </a>
 
           <nav className="hidden md:flex md:grow">
             <ul className="flex grow justify-end flex-wrap items-center">
@@ -99,7 +125,7 @@ const Header = () => {
                     </Link>
                   </li>
                   <li>
-              <Link href="/dashboard" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">
+              <Link href="/profil" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">
               <svg className="h-8 w-8 text-gray-600"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
               </svg>
@@ -114,7 +140,7 @@ const Header = () => {
               </Link>
               </li>
               <li>
-                <Link href="/logout" className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">Se déconnecter</Link>
+                <button onClick={SignOut} className="font-medium text-gray-600 hover:text-gray-900 px-5 py-3 flex items-center transition duration-150 ease-in-out">Se déconnecter</button>
               </li>
               
 

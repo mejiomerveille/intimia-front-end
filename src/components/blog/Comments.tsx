@@ -15,7 +15,13 @@ const Comments = ({ slug }) => {
     });
   }, []);
 
-
+if(!comments){
+  return(
+    <>
+    <div>Pas de commentaire</div>
+    </>
+  )
+}
   return (
     <>
       {comments.length > 0 && (

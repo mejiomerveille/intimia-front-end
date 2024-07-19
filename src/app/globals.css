@@ -48,7 +48,7 @@ body {
   padding: 0;
   margin: 0;
   --tw-bg-opacity: 1;
-  background-color: rgb(249 168 212 / var(--tw-bg-opacity));
+  /* background-color: rgb(249 168 212 / var(--tw-bg-opacity)); */
   font-family: 'Montserrat', sans-serif;
   &:before{
     content:'';
@@ -60,7 +60,7 @@ body {
   
 
 /* background-image: url("../../public/image 1.jpg"); */
-/* background-image: url("../../public/bg.jpg"); */
+background-image: url("../../public/wickedbackground.png");
 
     
     position: fixed;
@@ -72,11 +72,26 @@ body {
     background-size: cover;
   }
 }
+.p{
+  /* background-image: url("../../public/logo_momo.png"); */
+  width: 128px;
+  height: 130px;
+    
+    /* position: fixed; */
+    /* left: 0;
+    top: 0; */
+    /* z-index: -1; */
+    /* background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: cover; */
 
+}
 .text-shadow{
   text-shadow: 0px 2px 0px rgb(0 0 0 / 30%);
 }
-
+.active{
+  background-color: rgb(7, 245, 7);
+}
 .adjacent-post{
   & .arrow-btn{
     transition: width 300ms ease;
@@ -107,4 +122,66 @@ a {
 
 * {
   box-sizing: border-box;
+}
+.whatsappLink {
+  display: inline-flex;
+  align-items: center;
+}
+
+.whatsappLink span {
+  margin-left: 0.5rem;
+}
+/* .we{
+  width: 900px;
+} */
+
+@keyframes pulse-in {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+}
+
+@keyframes pulse-out {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-pulse-in {
+  animation: pulse-in 1s infinite;
+}
+
+.animate-pulse-out {
+  animation: pulse-out 1s infinite;
+}
+
+.animate-spin-reverse {
+  animation: spin-reverse 2s linear infinite;
 }

@@ -1,106 +1,122 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&display=swap');
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
+"use client";
+import { BsFillArrowRightCircleFill, BsFillArrowLeftCircleFill } from "react-icons/bs";
+import React, { useState, useEffect } from "react";
+import { BASE_URL_MEDIAS,currentWeek,getSemaine} from "@/app/services";
 
-/* Additional styles */
-@import './additional-styles/utility-patterns.css';
-@import './additional-styles/range-slider.css';
-@import './additional-styles/toggle-switch.css';
-@import './additional-styles/theme.css';
+export default function EvolutionGrossesseForm() {
+  const [numSemaine, setNumSemaine] = useState(1);
+  const [semaineInfo, setSemaineInfo] = useState({});
 
-@import 'tailwindcss/utilities';
+  useEffect(() => {
+    currentWeek()
+      .then(response => {
+        setNumSemaine(response.start_week);
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération de semaine:', error);
+      });
+  }, []);
 
-/* Additional Tailwind directives: https://tailwindcss.com/docs/functions-and-directives/#responsive */
-@layer utilities {
-    .rtl {
-        direction: rtl;
-    }
-}
-input{
-    @apply w-[400px0] border border-gray-200 py-2 px-6
-    bg-zinc-100/40;
-}
-@layer base {
-    .carouselform .swiper-button-prev,
-    .carouselform .swiper-button-next {
-        @apply bg-green-600 text-white top-[96%] md:top-[90%] w-[46px] rounded-full z-20
-    }
-    .carouselform .swiper-button-prev {
-        @apply left-[35%] md:left-[40%] lg:left-[45%]
-    }
-    .carouselform .swiper-button-next {
-        @apply right-[35%] md:right-[40%] lg:right-[45%]
-    }
-    .carouselform .swiper-button-prev::after,
-    .carouselform .swiper-button-next::after{
-        @apply text-lg
-    }
+  useEffect(() => {
+    getSemaine(numSemaine)
+      .then(response => {
+        setSemaineInfo(response);
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des grossesses:', error);
+      });
+  }, [numSemaine]);
 
-}
-
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: 'Montserrat', sans-serif;
-  &:before{
-    content:'';
-    content: "";
-    width: 100%;
-    height: 100vh;
-    /* background: linear-gradient(to right bottom, #6d327c, #485DA6, #00a1ba, #01b18e, #32b37b); */
-    /* background: #7ef5f5; */
-    /* background: #ebf3f3; */
-
-/* background-image: url("../../public/image 1.jpg"); */
-/* background-image: url("../../public/bg.jpg"); */
-
+  const handlePreviousWeek = () => {
     
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: -1;
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-}
-
-.text-shadow{
-  text-shadow: 0px 2px 0px rgb(0 0 0 / 30%);
-}
-
-.adjacent-post{
-  & .arrow-btn{
-    transition: width 300ms ease;
-    width: 50px;
-  }
-  &:hover{
-    & .arrow-btn{
-      width: 60px;
+    if (numSemaine > 1) {
+      setNumSemaine(numSemaine - 1);
     }
-  }
-}
+  };
 
-.react-multi-carousel-list {
-  & .arrow-btn{
-    transition: width 300ms ease;
-    width: 50px;
-    &:hover{
-      width: 60px;
+  const handleNextWeek = () => {
+    if (numSemaine < 41) {
+      setNumSemaine(numSemaine + 1);
     }
-  }
+  };
   
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
+  return (
+    <div className=" mt-24">
+      <div>
+        <h1 className="mb-3 ">Semaine actuelle</h1>
+        <div className="border-double border-4 border-indigo-600 w-20  h-20 ">{numSemaine}eme semaine</div>
+      </div>
+      <section className="text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+            <>
+              <div>
+                <h1 className="text-xl">photo de bébé</h1>
+                <div className="mx-auto" style={{ width: "220px", height: "220px" }}>
+                  <img src={`${BASE_URL_MEDIAS}/${semaineInfo.photoBebe}`}  alt="photo" />
+                  {/* <h3>Vous etes a la {numSemaine} semaines</h3>
+                  <h3>plus que {41-numSemaine} semaines</h3> */}
+                </div>
+              </div>
+              <div>
+                <h1 className="text-xl">illustration réelle</h1>
+                <div className="mx-auto" style={{ width: "220px", height: "320px" }}>
+                  <img src={`${BASE_URL_MEDIAS}/${semaineInfo.illustrationReelle}`}  alt="photo" />
+                </div>
+              </div>      
+              <div>
+                <h1 className="text-xl">photo du ventre de la mère</h1>
+                <div className="mx-auto" style={{ width: "220px", height: "220px" }}>
+                  <img src={`${BASE_URL_MEDIAS}/${semaineInfo.photoVentreMere}`} alt="photo" />
+                </div>
+              </div>
+            </> 
+        </div>
+        <div className="fixed top-0 h-full w-full flex justify-between items-center text-black px-10 text-3xl">
+          <button onClick={handlePreviousWeek} >
+            <BsFillArrowLeftCircleFill />
+          </button>
+          <button onClick={handleNextWeek}>
+            <BsFillArrowRightCircleFill />
+          </button>
+        </div>
+ 
+      <div className="instruction ">
+            <div className="card text-dark mb-96" >
+                <div className="card-body">
+                  {semaineInfo.Votre_bebe !=undefined?(  
+                    <>
+                    <h2 className="card-title">Votre bebe</h2>
+                    <h5 className="card-text">{semaineInfo.Votre_bebe}</h5>
+                    </> 
+                  ):(
+                    <div></div>
+                  )}
+                </div>
+                <div className="card-body">
+                    <h2 className="card-title">Votre corps</h2>
+                    <h5 className="card-text">{semaineInfo.Votre_corps}</h5>
+                </div>
+                <div className="card-body">
+                    <h2 className="card-title">Sante et conseils</h2>
+                    <h5 className="card-text">{semaineInfo.conseils}</h5>
+                </div>
+                <div className="card-body">
+                    <h2 className="card-title">Info pour le partenaire</h2>
+                    <h5 className="card-text">{semaineInfo.Info}</h5>
+                </div>
+                <div className="card-body">
+                {semaineInfo.Infojumeaux !=undefined?(  
+                    <>
+                    <h2 className="card-title">Info jumeaux/ Naissances multiples</h2>
+                    <h5 className="card-text">{semaineInfo.Infojumeaux}</h5>
+                    </> 
+                  ):(
+                    <div></div>
+                  )}
+                </div>
+            </div>
+        </div>
+        </section>
+    </div>
+    );
 }

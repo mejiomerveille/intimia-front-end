@@ -8,10 +8,10 @@
   /* body {
     background-image: url("../../public/Sans.jpeg");
   } */
-  #im{
-    width: 550px;
-    height: 350px;
-  }
+  /* #im{
+    width: 400px;
+    height: 400px;
+  } */
   .content-wrapper {
       overflow-y: scroll;
       height: calc(1000vh - 1000px); 

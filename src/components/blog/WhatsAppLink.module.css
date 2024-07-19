@@ -1,0 +1,13 @@
+.whatsappLink {
+    display: inline-flex;
+    align-items: center;
+    color: #25d366; /* Couleur verte de WhatsApp */
+    margin-top: 15px;
+  }
+  
+  .whatsappLink span {
+    margin-left: 0.5rem;
+  }
+  .whatsappIcon {
+    color: #25d366; /* Couleur verte de WhatsApp */
+  }

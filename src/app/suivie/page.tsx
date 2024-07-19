@@ -1,6 +1,17 @@
 "use client";
+import React, { useState, useEffect } from "react";
+import Loader from '@/components/register/loader';
 
 export default function s(){
+  const[loading,setLoading]=useState(true);
+  useEffect(()=>{
+    setTimeout(()=>setLoading(false),1000)
+  },[]);
+
+  if(loading){
+    return <Loader/>
+  }
+
   return(
     <div>
     <div className="flex flex-wrap justify-center mt-20">
@@ -48,7 +59,7 @@ export default function s(){
             <p className="leading-relaxed text-base text-white dark:text-gray-300">
                 ce bloc-note represente une exquice de journal intime pour votre grossesse.
             </p>
-            <a href="/suivie/Symptomes" className="mt-3 text-black dark:text-white hover:text-blue-600 inline-flex items-center">Explorer
+            <a href="/suivie/notes" className="mt-3 text-black dark:text-white hover:text-blue-600 inline-flex items-center">Explorer
                 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                     stroke-width="2" className="w-4 h-4 ml-2" viewBox="0 0 24 24">
                     <path d="M5 12h14M12 5l7 7-7 7"></path>
@@ -102,13 +113,13 @@ export default function s(){
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                 </svg>
             </div>
-            <h2 className="text-white dark:text-white text-lg font-medium">Chronologie</h2>
+            <h2 className="text-white dark:text-white text-lg font-medium">Symptomes</h2>
         </div>
         <div className="flex flex-col justify-between flex-grow">
             <p className="leading-relaxed text-base text-white dark:text-gray-300">
                 suivez les etapes cles de votre grossesse
             </p>
-            <a href="/suivie/chronologies" className="mt-3 text-black dark:text-white hover:text-blue-600 inline-flex items-center">Explorer
+            <a href="/suivie/Symptomes" className="mt-3 text-black dark:text-white hover:text-blue-600 inline-flex items-center">Explorer
                 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                     stroke-width="2" className="w-4 h-4 ml-2" viewBox="0 0 24 24">
                     <path d="M5 12h14M12 5l7 7-7 7"></path>
@@ -176,10 +187,10 @@ export default function s(){
 
 
 {/* mmmmmmmmmmmmmmmmmmmmmmmmmmm */}
-<div className="flex flex-wrap justify-center mt-10">
+{/* <div className="flex flex-wrap justify-center mt-10"> */}
 
 {/* <!-- card 1 --> */}
-<div className="p-4 max-w-sm">
+{/* <div className="p-4 max-w-sm">
     <div className="flex rounded-lg h-full dark:bg-gray-800 bg-teal-400 p-8 flex-col">
         <div className="flex items-center mb-3">
             <div
@@ -203,10 +214,10 @@ export default function s(){
             </a>
         </div>
     </div>
-</div>
+</div> */}
 
 {/* <!-- card 2 --> */}
-<div className="p-4 max-w-sm">
+{/* <div className="p-4 max-w-sm">
     <div className="flex rounded-lg h-full dark:bg-gray-800 bg-teal-400 p-8 flex-col">
         <div className="flex items-center mb-3">
             <div
@@ -230,10 +241,10 @@ export default function s(){
             </a>
         </div>
     </div>
-</div>
+</div> */}
 
 {/* <!-- card 3 --> */}
-<div className="p-4 max-w-sm">
+{/* <div className="p-4 max-w-sm">
     <div className="flex rounded-lg h-full dark:bg-gray-800 bg-teal-400 p-8 flex-col">
         <div className="flex items-center mb-3">
             <div
@@ -259,7 +270,7 @@ export default function s(){
     </div>
 </div>
 
-</div>
+</div> */}
 
     </div>
   )

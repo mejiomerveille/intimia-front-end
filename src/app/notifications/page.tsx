@@ -1,29 +1,11 @@
-"use client";
-import { useEffect, useState } from 'react';
+import React from 'react';
 
-function Notifications() {
-  const [notifications, setNotifications] = useState([]);
+import {Notifications} from '../../../pages/notification/actions';
 
-  useEffect(() => {
-    // Appel à l'API Django pour récupérer les notifications de l'utilisateur
-    fetch('http://localhost:8000/api/v1/notifications/')
-      .then(response => response.json())
-      .then(data => setNotifications(data.notifications))
-      .catch(error => console.error(error));
-  }, []);
-
+export default function SuccessPage() {
   return (
-    <div>
-      <h1>Notifications</h1>
-      <ul>
-        {notifications.map(notification => (
-          <li key={notification.id}>
-            <strong>{notification.date_created}</strong>: {notification.message}
-          </li>
-        ))}
-      </ul>
+    <div className="flex items-center justify-center h-screen">
+      <Notifications/>
     </div>
   );
 }
-
-export default Notifications;

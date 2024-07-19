@@ -1,9 +1,11 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import OpenAI from 'openai';
 import { Send } from "react-feather";
 import { content } from '@/components/utils/infoContent';
 import { BASE_URL } from '../services';
+import Loader from "@/components/register/loader";
+
 // import '@/app/styl.css';
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -15,6 +17,7 @@ export default function Chat() {
   const [userInput, setUserInput] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const[loading,setLoading]=useState(true);
 
   const handleUserInput = async () => {
     // Start the loading state
@@ -73,6 +76,13 @@ export default function Chat() {
     setIsLoading(false);
   };
 
+  useEffect(()=>{
+    setTimeout(()=>setLoading(false),1000)
+  },[]);
+
+  if(loading){
+    return <Loader/>
+  }
   return (
     <div className='bg-grey-100 min-h-screen flex flex-col justify-center items-center mt-10'>
       <div className='w-full max-w-screen-md mg-white p-4 rounded-lg shadow-md bg-stone-100'>

@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Message } from "../../../types/message";
 import { Send } from "react-feather";
 import LoadingDots from "@/components/LoadingDots";
+import Loader from "@/components/register/loader";
 
 export default function Home() {
   const [message, setMessage] = useState<string>("");
@@ -58,7 +59,14 @@ export default function Home() {
       lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [history]);
+  
+  useEffect(()=>{
+    setTimeout(()=>setLoading(false),1000)
+  },[]);
 
+  if(loading){
+    return <Loader/>
+  }
   return (
     <main className="h-screen bg-white p-6 flex flex-col">
       <div className="flex flex-col gap-8 w-full items-center flex-grow max-h-full">

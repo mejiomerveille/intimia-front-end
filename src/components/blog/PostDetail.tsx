@@ -3,8 +3,13 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 import { useEffect } from "react";
 import { BASE_URL_MEDIAS } from '../../app/services';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import styles from './WhatsAppLink.module.css';
+import { split } from 'postcss/lib/list';
 
 const PostDetail = ({ post }) => {
+  const whatsappUrl = `https://wa.me/${699637176}?text=${encodeURIComponent()}`;
   const router = useRouter();
   const currentUrl = router.asPath;
   useEffect(() => {
@@ -80,11 +85,14 @@ const PostDetail = ({ post }) => {
             </div>
           </div>
           <h1 className="mb-8 text-3xl font-semibold">{post.title}</h1>
-          {post.content}
-         
+          <p className='text-justify' >
+          {post.content.split('\n')}
+          </p>
         </div>
+        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className={styles.whatsappLink}>
+      <FontAwesomeIcon icon={faWhatsapp} /> <span>Démarrer la conversation WhatsApp avec le medecin</span>
+    </a>
       </div>
-
     </>
   );
 };

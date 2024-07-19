@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import RegisterGrossesseForm from "@/components/grossesse/RegisterGrossesse";
 import Welcome from '../welcome/page';
 import { getGrossesse } from '../services';
-Welcome
-getGrossesse
+import Loader from '@/components/register/loader';
 
 export default function blog(){
+  const[loading,setLoading]=useState(true);
   const [grossesse, setGrossesse] = useState([]);
 
   useEffect(() => {
@@ -20,7 +20,17 @@ export default function blog(){
       });
   }, []);
 
-  if(!grossesse){
+  useEffect(()=>{
+    setTimeout(()=>setLoading(false),1000)
+  },[]);
+
+
+  
+
+
+  if(grossesse.length===0){
+    console.log(grossesse)
+   
     return(
       <div  id="root">
       <RegisterGrossesseForm isOpened={true} />

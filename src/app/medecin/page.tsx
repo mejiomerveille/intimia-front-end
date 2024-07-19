@@ -4,9 +4,9 @@ import { useFormik } from "formik";
 import { css } from "@emotion/react";
 import { BeatLoader } from "react-spinners";
 import * as Yup from "yup";
-import { useState } from 'react';
+import Loader from "@/components/register/loader";
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-
 const override = css`
   display: block;
   margin: 0 auto;
@@ -20,6 +20,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const Medecin: NextPage = () => {
+  const[loading,setLoading]=useState(true);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -62,11 +63,18 @@ const Medecin: NextPage = () => {
 
   const { errors, touched, values, handleChange, handleSubmit } = formik;
 
+  useEffect(()=>{
+    setTimeout(()=>setLoading(false),1000)
+  },[]);
+
+  if(loading){
+    return <Loader/>
+  }
+
   return (
     <div className="grid place-items-center h-screen">
       <div className="shadow-lg p-5 rounded-lg border-t-4 border-green-400 bg-gray-50">
         <h1 className="text-xl font-bold my-4">Ajouter un médecin</h1>
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-3" method="POST">
           <label htmlFor="name">Nom</label>
           <input

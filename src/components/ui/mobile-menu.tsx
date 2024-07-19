@@ -3,15 +3,35 @@ import { useState, useRef, useEffect } from 'react'
 import { Transition } from '@headlessui/react'
 import Link from 'next/link'
 import { verifyLogin } from '@/app/services'
+import { logout } from '@/app/services';
+import { useRouter } from "next/navigation";
 
 export default function MobileMenu() {
-  const [verif, setel] = useState("");
+  const [verif, setVerif] = useState("");
   const [errorMessage, setErrorMessage] = useState('');
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false)
 
   const trigger = useRef<HTMLButtonElement>(null)
   const mobileNav = useRef<HTMLDivElement>(null)
+  const router = useRouter();
 
+  const SignOut = async () => {
+    try {
+      const response = await logout();
+      if (response) {
+        console.log(response)
+        if (response.detail=="Logged out successfully.") {
+          setVerif(response.statusText);
+          localStorage.removeItem('access_token');
+          router.replace("/");
+        }
+      } else {
+        console.log('Veuillez vous connecter!');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   // close the mobile menu on click outside
   useEffect(() => {
     const clickHandler = ({ target }: { target: EventTarget | null }): void => {
@@ -39,7 +59,7 @@ export default function MobileMenu() {
         const response = await verifyLogin();
         if (response) {
           if(response.status == 200 && response.statusText=="OK"){
-            setel(response.statusText);
+            setVerif(response.statusText);
           }
         } else {
           setErrorMessage('veuillez vous connecter!');
@@ -118,7 +138,7 @@ export default function MobileMenu() {
               <Link href="/chat" className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" onClick={() => setMobileNavOpen(false)}>ChatBot</Link>
             </li>
             <li>
-              <Link href="/dashboard" className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" onClick={() => setMobileNavOpen(false)}>
+              <Link href="/profil" className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" onClick={() => setMobileNavOpen(false)}>
               <svg className="h-8 w-8 text-gray-600"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
               </svg>
@@ -132,7 +152,7 @@ export default function MobileMenu() {
               </Link>
             </li>
             <li>
-              <Link href="/logout" className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center" onClick={() => setMobileNavOpen(false)}>Se déconnecter</Link>
+              <button onClick={SignOut} className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center">Se déconnecter</button>
             </li>
             </>
           )}       

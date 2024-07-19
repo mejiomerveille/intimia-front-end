@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import Loader from '@/components/register/loader';
 import Collapse from 'react-collapse';
 
 export default function Essai() {
@@ -11,6 +12,7 @@ export default function Essai() {
   const [isCollapsed5, setIsCollapsed5] = useState(false);
   const [isCollapsed6, setIsCollapsed6] = useState(false);
   const [isCollapsed7, setIsCollapsed7] = useState(false);
+  const[loading,setLoading]=useState(true);
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -36,6 +38,14 @@ export default function Essai() {
   const toggleCollapse7 = () => {
     setIsCollapsed7(!isCollapsed7);
   };
+
+  useEffect(()=>{
+    setTimeout(()=>setLoading(false),1000)
+  },[]);
+
+  if(loading){
+    return <Loader/>
+  }
 
   return (
     <div className="mt-28 bg-white ">

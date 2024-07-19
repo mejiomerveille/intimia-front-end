@@ -3,20 +3,14 @@ import Image from 'next/image';
 import moment from 'moment';
 import Link from 'next/link';
 import { BASE_URL_MEDIAS } from '@/app/services';
+import parse from 'html-react-parser';
+import sanitizeHtml from 'sanitize-html';
 
 const PostCard = ({ post }) => {
-  // console.log(post)
+  const paragraphs = post.content.split('\n\n');
+  const sanitizedContent = sanitizeHtml(post.content);
   return(
       <div className="bg-white shadow-lg rounded-lg p-0 lg:p-8 pb-12 mb-8 z-1">
-    {/* <div className="relative shadow-md inline-block w-full h-60 lg:h-80 mb-6">
-      <Image
-        unoptimized
-        alt={post.title}
-        className="shadow-lg rounded-t-lg lg:rounded-lg"
-        layout="fill"
-        src={post.image}
-      />
-    </div> */}
     <div className="relative overflow-hidden shadow-md pb-80 mb-6">
     <img src={`${BASE_URL_MEDIAS}${post.image}`} alt="" className="object-top absolute h-80 w-full object-cover shadow-lg rounded-t-lg lg:rounded-lg" />
     </div>
@@ -46,9 +40,17 @@ const PostCard = ({ post }) => {
         <span className="align-middle">{moment(post.date_added).format('MMM DD, YYYY')}</span>
       </div>
     </div>
-    <p className="text-center text-lg text-gray-700 font-normal px-4 lg:px-20 mb-8">
-      {post.content}
-    </p>
+    {paragraphs.map((paragraph, index) => (
+        <p key={index} className=" text-lg text-gray-700 font-normal px-4 lg:px-20 mb-8 text-justify">
+          {paragraph}
+          <br />
+        </p>
+      ))}
+    {/* <p className="text-center text-lg text-gray-700 font-normal px-4 lg:px-20 mb-8"
+      // dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+      >
+  {(post.content).split('\n')}
+    </p> */}
     <div className="text-center">
       <Link href={`/post/${post.slug}`}>
         <span className="transition duration-500 ease transform hover:-translate-y-1 inline-block bg-pink-600 text-lg font-medium rounded-full text-white px-8 py-3 cursor-pointer">Continue Reading</span>
@@ -58,5 +60,3 @@ const PostCard = ({ post }) => {
   )
 }
   export default PostCard;
-
-

@@ -1,6 +1,7 @@
 "use client";
 import { BsFillArrowRightCircleFill, BsFillArrowLeftCircleFill } from "react-icons/bs";
 import React, { useState, useEffect } from "react";
+import Loader from '@/components/register/loader';
 import axios from "axios"; 
 import { BASE_URL, BASE_URL_MEDIAS } from "@/app/services";
 import Modal from 'react-modal';
@@ -8,6 +9,7 @@ import Modal from 'react-modal';
 export default function Essai(){
   const [numSemaine, setNumSemaine] = useState(3);
   const [semaineInfo, setSemaineInfo] = useState({});
+  const[loading,setLoading]=useState(true);
 
   useEffect(() => {
     const fetchSemaineInfo = async () => {
@@ -34,6 +36,15 @@ export default function Essai(){
       setNumSemaine(numSemaine + 1);
     }
   };
+
+
+  useEffect(()=>{
+    setTimeout(()=>setLoading(false),1000)
+  },[]);
+
+  if(loading){
+    return <Loader/>
+  }
 
   return(
 <div className="bg-black-1500">
